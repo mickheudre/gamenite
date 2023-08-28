@@ -1,6 +1,6 @@
 <template>
     <div>
-      <button @click="signInWithOtp">
+      <button @click="signIn">
         Sign In with E-Mail
       </button>
       <input
@@ -15,24 +15,20 @@
 </template>
 
 <script setup lang="ts">
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
+import { useAuthStore } from "../stores/auth"
+
+const auth = useAuthStore()
 
 const email = ref('')
 const password = ref('')
 
-const signInWithOtp = async () => {
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-  email: email.value,
-  password: password.value,
-})
-  if (error) console.log(error)
+const signIn = async () => {
+    auth.signIn(email.value, password.value)
 }
 
 
-watch(user, () => {
-  if (user.value) {
+watch(auth, () => {
+  if (auth.isLoggedIn) {
     return navigateTo('/')
   }
 }, { immediate: true })

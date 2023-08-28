@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { toggleSidebar } from "./store";
-</script>
-
 <template>
   <header class="relative z-10 h-20 items-center">
     <div
@@ -107,14 +103,23 @@ import { toggleSidebar } from "./store";
               />
             </svg>
           </a>
-          <a href="#" class="relative block">
+          <button v-if="auth.isLoggedIn" @click="auth.signOut()" class="relative block">
             <div
-              class="mx-auto h-10 w-10 rounded-full bg-white"
+              class="mx-auto h-10 w-10 rounded-full bg-white text-black"
             >
+            {{ auth.userData.username[0] }}
             </div>
-          </a>
+          </button>
+          <button v-else>Se connecter</button>
         </div>
       </div>
     </div>
   </header>
 </template>
+
+<script setup lang="ts">
+import { toggleSidebar } from "./store";
+import { useAuthStore } from "../stores/auth"
+const auth = useAuthStore()
+auth.updateUserData()
+</script>
