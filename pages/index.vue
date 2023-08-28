@@ -1,6 +1,5 @@
 <template>
-  <h1>Hello {{ username }}</h1>
-  <button @click="logout">Logout</button>
+  <Content title="Home" />
 </template>
 
 <script setup lang="ts">
