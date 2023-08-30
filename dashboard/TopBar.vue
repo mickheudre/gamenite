@@ -16,7 +16,7 @@
           </button>
         </div>
         <div class="container relative left-0 flex w-3/4">
-          <div
+          <!-- <div
             class="group relative ml-8 hidden w-full items-center md:flex lg:w-72"
           >
             <div
@@ -50,12 +50,12 @@
               class="block w-full rounded-2xl bg-gray-800 py-1.5 pl-10 pr-4 leading-normal text-gray-400 opacity-90 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Search"
             />
-          </div>
+          </div> -->
         </div>
         <div
           class="relative ml-5 flex w-full items-center justify-end p-1 sm:right-auto sm:mr-0"
         >
-          <a href="#" class="block pr-5">
+          <!-- <a href="#" class="block pr-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-6 w-6"
@@ -70,7 +70,7 @@
                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
               />
             </svg>
-          </a>
+          </a> -->
           <a href="#" class="block pr-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,14 +103,13 @@
               />
             </svg>
           </a>
-          <button v-if="auth.isLoggedIn" @click="auth.signOut()" class="relative block">
+          <button @click="auth.signOut()" class="relative block">
             <div
-              class="mx-auto h-10 w-10 rounded-full bg-white text-black"
+              class="mx-auto h-10 w-10 rounded-full bg-white text-black capitalize"
             >
-            {{ auth.userData.username[0] }}
             </div>
           </button>
-          <button v-else>Se connecter</button>
+          <!-- <button v-else>Se connecter</button> -->
         </div>
       </div>
     </div>
@@ -119,7 +118,5 @@
 
 <script setup lang="ts">
 import { toggleSidebar } from "./store";
-import { useAuthStore } from "../stores/auth"
-const auth = useAuthStore()
-auth.updateUserData()
+const auth = useAuth()
 </script>

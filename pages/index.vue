@@ -1,25 +1,23 @@
 <template>
-  <Content title="Home" />
+  <!-- <Content title="Home" /> -->
+  <h1> Salut {{ profile?.username }} </h1>
+  <UCard class="lg:w-1/4">
+    <template #header>
+      <h4>Mon Compte</h4>
+    </template>
+    <UserProfileEditor v-if="profile != null" />
+  </UCard>
 </template>
 
 <script setup lang="ts">
-const user = useSupabaseUser()
-const supabase = useSupabaseClient()
-
-const username = ref("")
- await supabase
-  .from('users')
-  .select('username').then((data) => { username.value = data.data[0].username })
 
 
-const logout = async () => {
-  await supabase.auth.signOut()
-}
+//  const {data, error} = await supabase
+//   .from('subscription')
+//   .select('user_id')
 
-watch(user, () => {
-  if (!user.value) {
-    return navigateTo('/login')
-  }
-}, { immediate: true })
+// console.log(data)
+const user = useUser()
+const profile = user.profile
 
 </script>
