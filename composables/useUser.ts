@@ -11,7 +11,7 @@ export function useUser() {
         .select('*')
         .eq('id', userId)
         .single()   
-        console.log("fetching", data)
+        
         if (data) {
             profile.value = {
                 username: data.username,
