@@ -54,11 +54,4 @@ const signIn = async () => {
  await auth.signIn({email: email.value, password: password.value})
 }
 
-
-
-watch(auth.userSession, () => {
-  if (auth.userSession.value != null) {
-    return navigateTo('/')
-  }
-}, { immediate: true })
 </script>

@@ -22,6 +22,7 @@ export default defineNuxtPlugin({
             if (event == 'SIGNED_IN') {
               rolesStore.refresh()
               userStore.refresh()
+              navigateTo("/")
             }
   
           })
