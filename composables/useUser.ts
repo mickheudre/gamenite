@@ -1,26 +1,21 @@
 import { UserProfile  } from "~/types/global"
 export function useUser() {
+    const user = useSupabaseUser()
 
     const supabase = useSupabaseClient()
-    const profile = useState<UserProfile | null>("userProfile", () => { return null } )
+
     const auth = useAuth()
 
-    async function fetchProfile(userId: string) {
-        const {data, error}  = await supabase
+    const {pending, data : profile, error} = useLazyAsyncData('userProfile', async () =>  {
+         const {data, error}  = await supabase
         .from('users')
         .select('*')
-        .eq('id', userId)
+        .eq('id', user.value.id)
         .single()   
-        
-        if (data) {
-            profile.value = {
-                username: data.username,
-                firstname: data.first_name,
-                lastname: data.last_name
-            }
-        }
 
-    }
+        return data
+    })
+
 
     async function updateProfile(profile: UserProfile) {
         if (auth.userSession.value) {
@@ -33,7 +28,7 @@ export function useUser() {
 
     }
 
-    return { profile, fetchProfile, updateProfile }
+    return { profile, pending, updateProfile }
 
 } 
 

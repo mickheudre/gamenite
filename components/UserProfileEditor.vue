@@ -5,19 +5,8 @@ import {UserProfile } from "~/types/global"
 const user = useUser()
 const profile = user.profile
 
-const state = ref<UserProfile>({
-  username: profile.value.username,
-  firstname: profile.value.firstname,
-  lastname: profile.value.lastname
 
-})
 
-const validate = (state: any): FormError[] => {
-//   const errors = []
-//   if (!state.email) errors.push({ path: 'email', message: 'Required' })
-//   if (!state.password) errors.push({ path: 'password', message: 'Required' })
-  return [{ path: 'email', message: 'Required' }]
-}
 
 const form = ref()
 
@@ -29,19 +18,18 @@ async function submit () {
 <template>
   <UForm
     ref="form"
-    :validate="validate"
-    :state="state"
+    :state="profile"
     @submit.prevent="submit"
   >
     <UFormGroup label="Pseudo" name="username">
-      <UInput v-model="state.username" />
+      <UInput v-model="profile.username" />
     </UFormGroup>
 
     <UFormGroup label="Prénom" name="firstName">
-      <UInput v-model="state.firstname" />
+      <UInput v-model="profile.first_name" />
     </UFormGroup>
     <UFormGroup label="Nom" name="lastName">
-      <UInput v-model="state.lastname" />
+      <UInput v-model="profile.last_name" />
     </UFormGroup>
 
     <UButton type="submit">

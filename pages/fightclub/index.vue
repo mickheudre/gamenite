@@ -3,7 +3,10 @@
         <UCard>
             <template #header>
                 <h4 class="capitalize">événements</h4>
-
+                <UBadge> {{ roles }}</UBadge>
+            </template>
+            <template #footer>
+                <UButton icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
             </template>
             <UTable :loading="pending" :rows="data" :columns="columns" >
                 <template #start_at-data="{row}">
@@ -13,11 +16,30 @@
                 </template>
             </UTable>
         </UCard>
-    </UContainer>
-    
+        <USlideover v-model="isOpen">
+                <UForm
+                ref="form"
+                :state="newEventState"
+                >
+                <UFormGroup label="Nom" name="name">
+                    <UInput v-model="newEventState.name" />
+                </UFormGroup>
+                <UFormGroup label="Date" name="date">
+                    <UInput v-model="newEventState.date" type="datetime-local"  />
+                </UFormGroup>
+                <UButton type="submit">
+                    Submit
+                </UButton>
+            </UForm>
+
+    </USlideover>
+</UContainer>
+
 </template>
 
 <script setup lang="ts">
+
+const roles = useUserRoles().getRolesInOrg(1)
 const columns = [{
     label: 'Nom',
     key: 'name'
@@ -27,8 +49,14 @@ const columns = [{
     key: 'start_at'
 }
 ]
-const eventsList = useEvents()
 
+const newEventState = ref({
+    name: "",
+    date: "",
+    
+})
+const eventsList = useEvents()
+const isOpen = ref(false)
 const { pending, data } = await useLazyAsyncData('events', async () =>  await eventsList.fetchEvents())
 
 

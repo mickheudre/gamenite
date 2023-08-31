@@ -43,7 +43,6 @@ const columns = [
 ]
 const user = useUser()
 const profile = user.profile
-
 const roles = useUserRoles()
 const rolesList = roles.roles
 </script>

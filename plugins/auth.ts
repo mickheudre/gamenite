@@ -5,21 +5,19 @@ export default defineNuxtPlugin({
     async setup (nuxtApp) {
         const supabase = useSupabaseClient()
         const auth = useAuth()
-        const user = useUser()
-        const roles = useUserRoles()
+        // const user = useSupabaseUser()
+        // const user = useUser()
+        // const roles = useUserRoles()
         supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
 
             if (event == 'SIGNED_OUT') {
                 auth.userSession.value = null
-                user.profile.value = null
+              //  user.profile.value = null
                 navigateTo('/login')
                 return
             }
-
             auth.userSession.value = session
             if (session) {
-                await user.fetchProfile(session.user.id)
-                await roles.fetchRoles()
 
             }
           })
