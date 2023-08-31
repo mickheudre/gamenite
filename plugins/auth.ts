@@ -6,7 +6,6 @@ export default defineNuxtPlugin({
         const supabase = useSupabaseClient()
         const auth = useAuth()
         // const user = useSupabaseUser()
-        // const user = useUser()
         // const roles = useUserRoles()
         supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
 

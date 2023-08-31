@@ -1,11 +1,11 @@
 <template>
   <!-- <Content title="Home" /> -->
-  <h1> Salut {{ profile?.username }} </h1>
+  <!-- <h1> Salut {{ profile?.data.username }} </h1> -->
   <UCard class="lg:w-1/4">
     <template #header>
       <h4>Mes Roles</h4>
     </template>
-    <UTable :rows="rolesList" :columns="columns">
+    <UTable :rows="rolesStore.roles" :columns="columns" :loading="rolesStore.pending">
       <template #org-data={row}>
         <span>{{row.org.name}}</span>
       </template>
@@ -15,14 +15,15 @@
     </UTable>
   </UCard>
   <UCard class="lg:w-1/4">
-    <template #header>
+    <!-- <template #header>
       <h4>Mon Compte</h4>
     </template>
-    <UserProfileEditor v-if="profile != null" />
+    <UserProfileEditor v-if="profile != null" /> -->
   </UCard>
 </template>
 
 <script setup lang="ts">
+import { useRolesStore } from '@/stores/roles'
 
 
 //  const {data, error} = await supabase
@@ -41,8 +42,12 @@ const columns = [
     key: "role"
   }
 ]
-const user = useUser()
-const profile = user.profile
-const roles = useUserRoles()
-const rolesList = roles.roles
+// const user = useUser()
+// const profile = user.profile.data
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
+
+const rolesStore = useRolesStore()
+
+
 </script>

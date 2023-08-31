@@ -39,7 +39,6 @@
 
 <script setup lang="ts">
 
-const roles = useUserRoles().getRolesInOrg(1)
 const columns = [{
     label: 'Nom',
     key: 'name'
