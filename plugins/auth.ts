@@ -6,7 +6,7 @@ export default defineNuxtPlugin({
         const supabase = useSupabaseClient()
         const auth = useAuth()
         const user = useUser()
-
+        const roles = useUserRoles()
         supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
 
             if (event == 'SIGNED_OUT') {
@@ -18,7 +18,9 @@ export default defineNuxtPlugin({
 
             auth.userSession.value = session
             if (session) {
-                user.fetchProfile(session.user.id)
+                await user.fetchProfile(session.user.id)
+                await roles.fetchRoles()
+
             }
           })
     },

@@ -1,10 +1,6 @@
 <script lang="ts" setup>
 // Columns
-const columns = [{
-    key: 'id',
-    label: '#',
-    sortable: true
-}, 
+const columns = [
 {
     key: 'user',
     label: 'Membre',
@@ -13,6 +9,11 @@ const columns = [{
 {
     key: 'ressource',
     label: 'Table',
+    sortable: true
+}, 
+{
+    key: 'room',
+    label: 'Salle',
     sortable: true
 }, 
 {
@@ -97,12 +98,6 @@ const actions = [
             `)
             
             return data;
-        }, {
-            transform: (data) => {
-                const updated = data?.map( item =>  { return {id: item.id, user: item.user.username, ressource: item.ressource.name, start_at: item.start_at}})
-                console.log(updated)
-                return updated
-            }
         }
         )
         
@@ -194,30 +189,16 @@ sort-asc-icon="i-heroicons-arrow-up"
 sort-desc-icon="i-heroicons-arrow-down"
 @select="select"
 >
-<template #completed-data="{ row }">
-    <UBadge size="xs" :label="row.completed ? 'Completed' : 'In Progress'" :color="row.completed ? 'emerald' : 'orange'" variant="subtle" />
-</template>
 
-<template #actions-data="{ row }">
-    <UButton
-    v-if="!row.completed"
-    icon="i-heroicons-check"
-    size="2xs"
-    color="emerald"
-    variant="outline"
-    :ui="{ rounded: 'rounded-full' }"
-    square
-    />
-    
-    <UButton
-    v-else
-    icon="i-heroicons-arrow-path"
-    size="2xs"
-    color="orange"
-    variant="outline"
-    :ui="{ rounded: 'rounded-full' }"
-    square
-    />
+
+<template #user-data="{ row }">
+    <span>{{  row.user.username }}</span>
+</template>
+<template #ressource-data="{ row }">
+    <span>{{  row.ressource.name }}</span>
+</template>
+<template #room-data="{ row }">
+    <span>{{  row.ressource.room.name }}</span>
 </template>
 </UTable>
 
