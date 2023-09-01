@@ -45,8 +45,4 @@ const columns = [
 // const profile = user.profile.data
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-
-
-console.log(userStore.profile)
-
 </script>

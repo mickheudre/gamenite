@@ -17,5 +17,12 @@ export const useUserStore = defineStore('userStore', () => {
         return data 
     })
     
-    return { profile, pending, refresh }
+    async function updateProfile(profile) {
+        const { error } = await supabase
+        .from('users')
+        .update({ username: profile.username, first_name : profile.firstName, last_name: profile.lastName })
+        .eq('id', user.value.id)
+        refresh()
+}
+    return { profile, pending, refresh, updateProfile }
   })

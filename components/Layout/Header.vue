@@ -16,7 +16,11 @@ const userStore = useUserStore()
 
 const items = [
 [{
-    label: 'Profil'
+    label: 'Profil',
+    icon: 'i-heroicons-user',
+    click: () => {
+        navigateTo('/account')
+    }
 }], 
 [{
     label: 'Se déconnecter',
