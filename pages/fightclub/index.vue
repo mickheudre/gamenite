@@ -3,12 +3,11 @@
         <UCard>
             <template #header>
                 <h4 class="capitalize">événements</h4>
-                <UBadge> {{ roles }}</UBadge>
             </template>
             <template #footer>
                 <UButton icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
             </template>
-            <UTable :loading="pending" :rows="data" :columns="columns" >
+            <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="columns" >
                 <template #start_at-data="{row}">
                     
                     <span>{{ formatDate(row.start_at) }}</span>
@@ -38,6 +37,9 @@
 </template>
 
 <script setup lang="ts">
+import { useEventsStore } from '~/stores/events';
+
+const eventsStore = useEventsStore()
 
 const columns = [{
     label: 'Nom',
@@ -56,7 +58,7 @@ const newEventState = ref({
 })
 const eventsList = useEvents()
 const isOpen = ref(false)
-const { pending, data } = await useLazyAsyncData('events', async () =>  await eventsList.fetchEvents())
+
 
 
 const formatDate = (date: string) => {

@@ -8,18 +8,12 @@
       </template>
       <UTable :rows="rolesStore.roles" :columns="columns" :loading="rolesStore.pending">
         <template #org-data={row}>
-          <span>{{row.org.name}}</span>
+          <NuxtLink to="/fightclub">{{row.org.name}}</NuxtLink>
         </template>
         <template #role-data={row}>
           <UBadge>{{row.role}}</UBadge>
         </template>
       </UTable>
-    </UCard>
-    <UCard >
-      <!-- <template #header>
-        <h4>Mon Compte</h4>
-      </template>
-      <UserProfileEditor v-if="profile != null" /> -->
     </UCard>
   </UContainer>
 </template>
@@ -27,6 +21,9 @@
 <script setup lang="ts">
 import { useRolesStore } from '@/stores/roles'
 import { useUserStore } from '~/stores/user';
+
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 
 const rolesStore = useRolesStore()
 const userStore = useUserStore()
@@ -41,8 +38,6 @@ const columns = [
   key: "role"
 }
 ]
-// const user = useUser()
-// const profile = user.profile.data
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
+
+
 </script>
