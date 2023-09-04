@@ -9,7 +9,6 @@ export const useEventsStore = defineStore('eventsStore', () => {
     const {pending, data: events, error, refresh} =  useLazyAsyncData('events', async () => {
         const {data, error} = await supabase.from("events").select("*")
         const events = ref([])
-        data?.forEach(event => { events.value.push(Object.assign({}, event))})
         return data
     })
     

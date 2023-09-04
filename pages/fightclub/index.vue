@@ -19,14 +19,14 @@
             <vue-cal v-if="!loading && !user"
             :events="eventsCal"
             hide-view-selector
-            :time-from="0 * 60"
+            :time-from="9 * 60"
             :time-to="24 * 60"
             :disable-views="['years', 'year', 'month', 'day']">
         </vue-cal>
         <vue-cal v-if="!loading && user"
             :events="eventsCal"
             hide-view-selector
-            :time-from="0 * 60"
+            :time-from="9 * 60"
             :time-to="24 * 60"
             :snap-to-time="15"
             :disable-views="['years', 'year', 'month', 'day']"
@@ -58,18 +58,19 @@
 
 <script setup lang="ts">
 import { useEventsStore } from '~/stores/events';
-
+import { useOpeningHoursStore} from '~/stores/opening_hours'
 
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 
 const user = useSupabaseUser()
 const eventsStore = useEventsStore()
+const openingHoursStore = useOpeningHoursStore()
 const eventsCal = ref([])
 
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), class: "demo_event"}))
-
+openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), class: "opening_hour"}))
 
 // //eventsCal.map(event => { delete Object.assign(event, {['start']: event['start_at'] })['start_at'];})
 // console.log(eventsCal)
@@ -92,6 +93,7 @@ const newEventState = ref({
     start: "",
     end: ""
 })
+
 
 const loading = ref(true)
 const isOpen = ref(false)
@@ -129,6 +131,32 @@ const formatDate = (date: string) => {
 <style>
 
 .demo_event {color: #fcf0ff;background-color: #d168ee;}
+.opening_hour {  background:
+    #fff7f0
+    repeating-linear-gradient(
+      -45deg,
+      #65b891,
+      #65b891 5px,
+      #93e5ab 5px,
+      #93e5ab 15px
+    );
+color: 4e878c}
 
+.opening_hour>.vuecal__event-time  {
+    display: none;
+}
+
+.closed {
+  background:
+    #fff7f0
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 162, 87, 0.25),
+      rgba(255, 162, 87, 0.25) 5px,
+      rgba(255, 255, 255, 0) 5px,
+      rgba(255, 255, 255, 0) 15px
+    );
+  color: #f6984c;
+}
 
 </style>
