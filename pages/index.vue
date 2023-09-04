@@ -11,7 +11,7 @@
           <NuxtLink to="/fightclub">{{row.org.name}}</NuxtLink>
         </template>
         <template #role-data={row}>
-          <UBadge>{{row.role}}</UBadge>
+          <UBadge class="mx-2" v-for="role in row.roles">{{role}}</UBadge>
         </template>
       </UTable>
     </UCard>

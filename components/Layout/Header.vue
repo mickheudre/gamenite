@@ -1,7 +1,8 @@
 <template>
     <div class="relative w-full flex justify-between p-4">
         <span>Gamenite</span>
-        <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
+        <UButton v-if="!user"><NuxtLink to="/login">Se connecter</NuxtLink></UButton>
+        <UDropdown v-else :items="items" :popper="{ placement: 'bottom-start' }">
             <UAvatar :alt="userStore.profile.username" size="lg" />
         </UDropdown>
         
@@ -9,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+const user = useSupabaseUser()
+
 import { useUserStore } from '@/stores/user'
 
 const auth = useAuth()

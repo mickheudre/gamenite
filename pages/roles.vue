@@ -1,6 +1,6 @@
 <template>
     <h1>Utilisateurs</h1>
-    <UTable :columns="columns" :rows="data" >
+    <!-- <UTable :columns="columns" :rows="data" >
         <template #user_id-data="{ row }">
             <span>{{ row.user_id.username }}</span>
         </template>
@@ -24,41 +24,41 @@
                 </div>
 
         </template>
-    </UTable>
+    </UTable> -->
     
 </template>
 
 <script setup lang="ts">
-const userList = useRoles()
-await userList.fetchRoles()
+// const userList = useRoles()
+// await userList.fetchRoles()
 
-const items = (row) => [
-  [{
-    label: 'admin',
-    slot: 'admin',
-    click: () => {
-        row.role = 'admin'
-    }
+// const items = (row) => [
+//   [{
+//     label: 'admin',
+//     slot: 'admin',
+//     click: () => {
+//         row.role = 'admin'
+//     }
    
-  }, {
-    label: 'member',
-    slot: 'member',
-    click: () => {
-      row.role = 'member'
-    }
-  }]
-]
-const columns = [{
-    key: 'user_id',
-    label: 'Utilisateur'
-}, {
-    key: 'org',
-    label: 'Organisation'
-}, {
-    key: 'role',
-    label: 'Role'
-}
-]
+//   }, {
+//     label: 'member',
+//     slot: 'member',
+//     click: () => {
+//       row.role = 'member'
+//     }
+//   }]
+// ]
+// const columns = [{
+//     key: 'user_id',
+//     label: 'Utilisateur'
+// }, {
+//     key: 'org',
+//     label: 'Organisation'
+// }, {
+//     key: 'role',
+//     label: 'Role'
+// }
+// ]
 
-const data = userList.roles.value
+// const data = userList.roles.value
 </script>
