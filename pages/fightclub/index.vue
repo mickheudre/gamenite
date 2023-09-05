@@ -7,17 +7,20 @@
             <template #footer>
                 <UButton v-if="userCanManageEvent" icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
             </template>
-            <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="columns" :sort="{ column: 'start_at',  direction: 'asc' }">
+            <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="userCanManageEvent ? columnsAdmin : columnsGuest" :sort="{ column: 'start_at',  direction: 'asc' }">
                 <template #start_at-data="{row}">
-                    
                     <span>{{ formatDate(row.start_at) }}</span>
-                    
+                </template>
+                <template #actions-data="{ row }" >
+                    <UDropdown :items="items(row)">
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+                    </UDropdown>
                 </template>
             </UTable>
             
         </UCard>
         <UCard class="my-8">
-            <vue-cal v-if="!loading && !user"
+            <vue-cal v-if="!loading && !userCanManageEvent"
             locale="fr"
             :events="eventsCal"
             hide-view-selector
@@ -42,8 +45,18 @@
     
 </UCard>
 <USlideover v-model="isOpen">
+    <UFormGroup label="Nom" name="name">
+        <UInput v-model="newEventState.name" />
+    </UFormGroup>
+    <UFormGroup label="Date" name="date">
+        <UInput type="datetime-local" v-model="newEventState.start" />
+        <UInput type="datetime-local" v-model="newEventState.end" />
+    </UFormGroup>
+    <UFormGroup label="Description" name="description">
+        <UTextarea />
+    </UFormGroup>
     <UButton @click="cancelEvent()">Cancel</UButton>
-    <UButton @click="isOpen = false">Ajouter</UButton>
+    <UButton @click="submitEvent()">Ajouter</UButton>
 </USlideover>
 
 </UContainer>
@@ -63,7 +76,6 @@ const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
 const eventsCal = ref([])
 
-console.log(userStore.profile)
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), class: "demo_event"}))
 openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), class: "opening_hour", background: true}))
@@ -74,7 +86,7 @@ openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "
 
 
 
-const columns = [{
+const columnsGuest = [{
     label: 'Nom',
     key: 'name'
 },
@@ -85,10 +97,24 @@ const columns = [{
 }
 ]
 
+const columnsAdmin = [{
+    label: 'Nom',
+    key: 'name'
+},
+{
+    label: 'Date',
+    key: 'start_at',
+    sortable: true
+},
+{
+    key: "actions"
+}
+]
+
 const newEventState = ref({
-    name: "",
-    start: "",
-    end: ""
+    name: "Nouvel Evénement",
+    start: new Date().toISOString().slice(0, 19),
+    end: new Date().toISOString().slice(0, 19)
 })
 
 const newEvent = ref({event: null, deleteFunction: null})
@@ -111,11 +137,28 @@ const onEventCreate = (event, deleteEvent) => {
 
 const cancelEvent = () => {
     isOpen.value = false
-    newEvent.value.deleteFunction()
+    if (newEvent.value.deleteFunction) {
+        newEvent.value.deleteFunction()
+    }
 }
 const submitEvent = () => {
     eventsStore.addEvent({name: newEventState.value.name, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
+    isOpen.value = false
 }
+
+const items = (row) => [
+// [{
+//     label: "Mofifier l'évenement",
+//     icon: 'i-heroicons-pencil-square-20-solid',
+//     click: () => console.log('Edit', row.id)
+// }], 
+[{
+    label: "Supprimer",
+    icon: 'i-heroicons-trash-20-solid',
+    click: () => eventsStore.deleteEvent(row.id)
+}]
+]
+
 
 onMounted(() => {
     loading.value = false
@@ -152,7 +195,7 @@ const userCanManageEvent = computed(() => {
     #93e5ab 5px,
     #93e5ab 15px
     );
-
+    
     border-color: #65b891;
     border-width: 2px;
     color: 4e878c}
