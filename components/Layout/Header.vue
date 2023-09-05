@@ -1,21 +1,29 @@
 <template>
     <div class="relative w-full flex justify-between p-4">
         <span>Gamenite</span>
-        <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
-            <UAvatar :alt="profile.username" size="lg" />
+        <UButton v-if="!user"><NuxtLink to="/login">Se connecter</NuxtLink></UButton>
+        <UDropdown v-else :items="items" :popper="{ placement: 'bottom-start' }">
+            <UAvatar :alt="userStore.profile.username" size="lg" />
         </UDropdown>
         
     </div>
 </template>
 
 <script setup lang="ts">
+const user = useSupabaseUser()
+
+import { useUserStore } from '@/stores/user'
+
 const auth = useAuth()
-const user = useUser()
-const profile = user.profile
+const userStore = useUserStore()
 
 const items = [
 [{
-    label: 'Profil'
+    label: 'Profil',
+    icon: 'i-heroicons-user',
+    click: () => {
+        navigateTo('/account')
+    }
 }], 
 [{
     label: 'Se déconnecter',

@@ -1,26 +1,35 @@
 import { Session, AuthChangeEvent} from '@supabase/gotrue-js/dist/main/lib/types'
+import { useEventsStore } from '~/stores/events'
+import { useRolesStore } from '~/stores/roles'
+import { useUserStore } from '~/stores/user'
 
 export default defineNuxtPlugin({
-    name: 'my-plugin',
+    name: 'auth-manager',
     async setup (nuxtApp) {
         const supabase = useSupabaseClient()
-        const auth = useAuth()
-        // const user = useSupabaseUser()
-        // const user = useUser()
-        // const roles = useUserRoles()
-        supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
+        const rolesStore = useRolesStore()
+        const userStore = useUserStore()
+        const eventsStore = useEventsStore()
 
+        supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
+          console.log(event)
             if (event == 'SIGNED_OUT') {
-                auth.userSession.value = null
               //  user.profile.value = null
-                navigateTo('/login')
+                //navigateTo('/login')
                 return
             }
-            auth.userSession.value = session
-            if (session) {
-
+            if (event == 'PASSWORD_RECOVERY') {
+              return 
             }
+            if (event == 'SIGNED_IN') {
+              rolesStore.refresh()
+              userStore.refresh()
+              eventsStore.refresh()
+              navigateTo("/fightclub")
+            }
+  
           })
-    },
+
+        },
     
 })

@@ -1,35 +1,39 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxthq/ui/dist/runtime/types'
+import { useUserStore } from '~/stores/user';
 import {UserProfile } from "~/types/global"
 
-const user = useUser()
-const profile = user.profile
+const userStore = useUserStore()
 
 
-
+const state = ref<UserProfile>({
+  username : userStore.profile.username,
+  firstName: userStore.profile.first_name,
+  lastName: userStore.profile.last_name
+})
 
 const form = ref()
 
 async function submit () {
-    await user.updateProfile(state.value)
+    await userStore.updateProfile(state.value)
 }
 </script>
 
 <template>
   <UForm
     ref="form"
-    :state="profile"
+    :state="state"
     @submit.prevent="submit"
   >
     <UFormGroup label="Pseudo" name="username">
-      <UInput v-model="profile.username" />
+      <UInput v-model="state.username" />
     </UFormGroup>
 
     <UFormGroup label="Prénom" name="firstName">
-      <UInput v-model="profile.first_name" />
+      <UInput v-model="state.firstName" />
     </UFormGroup>
     <UFormGroup label="Nom" name="lastName">
-      <UInput v-model="profile.last_name" />
+      <UInput v-model="state.lastName" />
     </UFormGroup>
 
     <UButton type="submit">
