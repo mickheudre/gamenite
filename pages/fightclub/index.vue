@@ -5,7 +5,7 @@
                 <h4 class="capitalize">événements</h4>
             </template>
             <template #footer>
-                <UButton icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
+                <UButton v-if="userCanManageEvent" icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
             </template>
             <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="columns" :sort="{ column: 'start_at',  direction: 'asc' }">
                 <template #start_at-data="{row}">
@@ -25,7 +25,7 @@
             :time-to="24 * 60"
             :disable-views="['years', 'year', 'month', 'day']">
         </vue-cal>
-        <vue-cal v-if="!loading && user"
+        <vue-cal v-if="!loading && userCanManageEvent"
         locale="fr"
         :events="eventsCal"
         hide-view-selector
@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { useEventsStore } from '~/stores/events';
+import { useUserStore } from '~/stores/user'
 import { useOpeningHoursStore} from '~/stores/opening_hours'
 
 import VueCal from 'vue-cal'
@@ -58,9 +59,11 @@ import 'vue-cal/dist/vuecal.css'
 
 const user = useSupabaseUser()
 const eventsStore = useEventsStore()
+const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
 const eventsCal = ref([])
 
+console.log(userStore.profile)
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), class: "demo_event"}))
 openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), class: "opening_hour", background: true}))
@@ -125,7 +128,15 @@ const formatDate = (date: string) => {
     return eventStart.toLocaleString('fr-FR', { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", hour12: false }) 
 }
 
-
+const userCanManageEvent = computed(() => {
+    const roles = userStore.profile?.roles
+    if (roles?.length > 0) {
+        if (roles.find(role => (role.org.id == 1) && role.roles.find(role => role === 'admin') )) {
+            return true
+        }
+    }
+    return false
+})
 </script>
 
 

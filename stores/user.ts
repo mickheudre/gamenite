@@ -9,12 +9,15 @@ export const useUserStore = defineStore('userStore', () => {
 
 
     const {pending, data : profile, error, refresh} =  useLazyAsyncData('userProfile', async () =>  {
-        const {data, error}  = await supabase
+        const {data : dataUser, error : ErrorUser}  = await supabase
         .from('users')
         .select('*')
         .eq('id', user.value.id)
-        .single()       
-        return data 
+        .single()      
+        
+        const {data : dataRoles, error: errorRoles}  = await supabase.from("roles").select("org (id, name) , roles").eq("user_id", user.value.id)
+        console.log(dataRoles)
+        return {...dataUser, roles: dataRoles}
     })
     
     async function updateProfile(profile) {

@@ -12,10 +12,10 @@ export default defineNuxtPlugin({
         const eventsStore = useEventsStore()
 
         supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
-          console.log(event)
             if (event == 'SIGNED_OUT') {
-              //  user.profile.value = null
-                //navigateTo('/login')
+              rolesStore.refresh()
+              userStore.refresh()
+              eventsStore.refresh()
                 return
             }
             if (event == 'PASSWORD_RECOVERY') {
