@@ -7,7 +7,7 @@
             <template #footer>
                 <UButton icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
             </template>
-            <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="columns" >
+            <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="columns" :sort="{ column: 'start_at',  direction: 'asc' }">
                 <template #start_at-data="{row}">
                     
                     <span>{{ formatDate(row.start_at) }}</span>
@@ -77,7 +77,8 @@ const columns = [{
 },
 {
     label: 'Date',
-    key: 'start_at'
+    key: 'start_at',
+    sortable: true
 }
 ]
 
@@ -130,7 +131,7 @@ const formatDate = (date: string) => {
 
 <style>
 
-.demo_event {color: #fcf0ff;background-color: #d168ee;}
+.demo_event {color: #fcf0ff;background-color: #d168ee; }
 .opening_hour {  background:
     #fff7f0
     repeating-linear-gradient(
@@ -140,6 +141,9 @@ const formatDate = (date: string) => {
     #93e5ab 5px,
     #93e5ab 15px
     );
+
+    border-color: #65b891;
+    border-width: 2px;
     color: 4e878c}
     
     
