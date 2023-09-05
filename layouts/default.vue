@@ -6,6 +6,8 @@
   <Head>
   </Head>
   <div class="w-screen h-screen ">
+    <NuxtLoadingIndicator />
+
     <LayoutHeader />
     <slot />
   </div>

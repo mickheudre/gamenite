@@ -5,7 +5,7 @@
                 <h4 class="capitalize">événements</h4>
             </template>
             <template #footer>
-                <!-- <UButton icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton> -->
+                <UButton icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
             </template>
             <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="columns" >
                 <template #start_at-data="{row}">
@@ -14,9 +14,11 @@
                     
                 </template>
             </UTable>
+            
         </UCard>
         <UCard class="my-8">
             <vue-cal v-if="!loading && !user"
+            locale="fr"
             :events="eventsCal"
             hide-view-selector
             :time-from="9 * 60"
@@ -24,35 +26,26 @@
             :disable-views="['years', 'year', 'month', 'day']">
         </vue-cal>
         <vue-cal v-if="!loading && user"
-            :events="eventsCal"
-            hide-view-selector
-            :time-from="9 * 60"
-            :time-to="24 * 60"
-            :snap-to-time="15"
-            :disable-views="['years', 'year', 'month', 'day']"
-            :editable-events="{ title: true, drag: true, resize: true, delete: true, create: true }"
-            :drag-to-create-threshold="0"
-            @event-drag-create="onEventCreate">
-            
-        </vue-cal>
-
-    </UCard>
-    <USlideover v-model="isOpen">
-
-        <UFormGroup label="Nom" name="name">
-            <UInput v-model="newEventState.name" />
-        </UFormGroup>
-        <UFormGroup label="Date" name="date">
-            <UInput v-model="newEventState.start" type="datetime-local"  />
-            <UInput v-model="newEventState.end" type="datetime-local"  />
-
-            <!-- <UInput v-model="newEventState.end" type="datetime-local"  /> -->
-
-        </UFormGroup>
-        <UButton type="submit" @click="submitEvent">
-            Submit
-        </UButton>    
+        locale="fr"
+        :events="eventsCal"
+        hide-view-selector
+        :time-from="9 * 60"
+        :time-to="24 * 60"
+        :snap-to-time="15"
+        :disable-views="['years', 'year', 'month', 'day']"
+        :editable-events="{ title: true, drag: true, resize: true, delete: true, create: true }"
+        :drag-to-create-threshold="0"
+        @event-create="onEventCreate"
+        @event-drag-create="isOpen = true">
+        
+    </vue-cal>
+    
+</UCard>
+<USlideover v-model="isOpen">
+    <UButton @click="cancelEvent()">Cancel</UButton>
+    <UButton @click="isOpen = false">Ajouter</UButton>
 </USlideover>
+
 </UContainer>
 </template>
 
@@ -70,7 +63,7 @@ const eventsCal = ref([])
 
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), class: "demo_event"}))
-openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), class: "opening_hour"}))
+openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), class: "opening_hour", background: true}))
 
 // //eventsCal.map(event => { delete Object.assign(event, {['start']: event['start_at'] })['start_at'];})
 // console.log(eventsCal)
@@ -94,21 +87,28 @@ const newEventState = ref({
     end: ""
 })
 
-
+const newEvent = ref({event: null, deleteFunction: null})
 const loading = ref(true)
 const isOpen = ref(false)
 
-const onEventCreate = (event, deleteEventFunction) => {
+const onEventCreate = (event, deleteEvent) => {
+    newEvent.value.event = event
+    if (deleteEvent) {
+        newEvent.value.deleteFunction = deleteEvent
+    }
     const eventStart = new Date(event.start)
     eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
     const eventEnd = new Date(event.end)
     eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
     newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
     newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
-    isOpen.value = true
+    return event
 }
 
-
+const cancelEvent = () => {
+    isOpen.value = false
+    newEvent.value.deleteFunction()
+}
 const submitEvent = () => {
     eventsStore.addEvent({name: newEventState.value.name, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
 }
@@ -134,29 +134,45 @@ const formatDate = (date: string) => {
 .opening_hour {  background:
     #fff7f0
     repeating-linear-gradient(
-      -45deg,
-      #65b891,
-      #65b891 5px,
-      #93e5ab 5px,
-      #93e5ab 15px
+    -45deg,
+    #65b891,
+    #65b891 5px,
+    #93e5ab 5px,
+    #93e5ab 15px
     );
-color: 4e878c}
-
-.opening_hour>.vuecal__event-time  {
-    display: none;
-}
-
-.closed {
-  background:
-    #fff7f0
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255, 162, 87, 0.25),
-      rgba(255, 162, 87, 0.25) 5px,
-      rgba(255, 255, 255, 0) 5px,
-      rgba(255, 255, 255, 0) 15px
-    );
-  color: #f6984c;
-}
-
+    color: 4e878c}
+    
+    
+    
+    .closed {
+        background:
+        #fff7f0
+        repeating-linear-gradient(
+        -45deg,
+        rgba(255, 162, 87, 0.25),
+        rgba(255, 162, 87, 0.25) 5px,
+        rgba(255, 255, 255, 0) 5px,
+        rgba(255, 255, 255, 0) 15px
+        );
+        color: #f6984c;
+    }
+    
+    @media (min-width: 640px) {
+        .opening_hour>.vuecal__event-time  {
+            display: none;
+        }
+    }
+    @media (max-width: 640px) {
+        .vuecal__time-cell-label {
+            @apply hidden 
+        };
+        
+        .vuecal__time-column {
+            @apply w-0
+        };
+        .vuecal--view-with-time .vuecal__weekdays-headings {
+            @apply pl-0 
+        };
+    }
+    
 </style>
