@@ -21,7 +21,7 @@ import { useEventsStore } from '~/stores/events';
 const eventsStore = useEventsStore()
 import { useUserStore } from '~/stores/user'
 const userStore = useUserStore()
-const emit = defineEmits(['editEvent', 'showDetails'])
+const emit = defineEmits(['editEvent', 'deleteEvent', 'showDetails'])
 
 const columnsGuest = [{
     label: 'Nom',
@@ -59,7 +59,7 @@ const items = (row) => [
 [{
     label: "Supprimer",
     icon: 'i-heroicons-trash-20-solid',
-    click: () => eventsStore.deleteEvent(row.id)
+    click: () => emit('deleteEvent', row)
 }]
 ]
 
