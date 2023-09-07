@@ -1,67 +1,34 @@
+<template>
+<USlideover>
+    <UCard>
+      <template #header>
+        <h4>{{ props.event.mode == "edit" ? "Modifier un événement" : "Proposer un événement"}}</h4>
+      </template>  
+        <UFormGroup label="Nom" name="name">
+            <UInput v-model="props.event.name" />
+        </UFormGroup>
+        <UFormGroup label="Date" name="date">
+            <UInput type="datetime-local" v-model="props.event.start" />
+            <UInput type="datetime-local" v-model="props.event.end" />
+        </UFormGroup>
+        <UFormGroup label="Description" name="description">
+            <UTextarea v-model="props.event.description"/>
+        </UFormGroup>
+        <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
+        <UButton @click="validate">Valider</UButton>
+    </UCard> 
+</USlideover>
+</template>
+
 <script setup>
-const items = [{
-  slot: 'account',
-  label: 'Ouverture'
-}, {
-  slot: 'password',
-  label: 'Evenement'
-}]
-const accountForm = reactive({ name: 'Benjamin', username: 'benjamincanac'  })
-const passwordForm = reactive({ currentPassword: '', newPassword: '' })
-function onSubmitAccount () {
-  console.log('Submitted form:', accountForm)
-}
-function onSubmitPassword () {
-  console.log('Submitted form:', passwordForm)
+const props = defineProps(['event'])
+const emit = defineEmits(['cancel', 'createEvent', 'editEvent'])
+
+const validate = () => {
+  if (props.event.mode == 'edit') {
+    emit('editEvent', props.event)
+  } else {
+    emit('createEvent', props.event)
+  }
 }
 </script>
-<template>
-  <UTabs :items="items" class="w-full">
-    <template #account="{ item }">
-      <UCard @submit.prevent="onSubmitAccount">
-        <template #header>
-          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-            {{ item.label }}
-          </h3>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Ajouter un créneau d'ouverture
-          </p>
-        </template>
-        <UFormGroup label="Name" name="name" class="mb-3">
-          <UInput v-model="accountForm.name" />
-        </UFormGroup>
-        <UFormGroup label="Username" name="username">
-          <UInput v-model="accountForm.username" />
-        </UFormGroup>
-        <template #footer>
-          <UButton type="submit" color="black">
-            Save account
-          </UButton>
-        </template>
-      </UCard>
-    </template>
-    <template #password="{ item }">
-      <UCard @submit.prevent="onSubmitPassword">
-        <template #header>
-          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-            {{ item.label }}
-          </h3>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Ajouter un évenement
-          </p>
-        </template>
-        <UFormGroup label="Current Password" name="current" required class="mb-3">
-          <UInput v-model="passwordForm.currentPassword" type="password" required />
-        </UFormGroup>
-        <UFormGroup label="New Password" name="new" required>
-          <UInput v-model="passwordForm.newPassword" type="password" required />
-        </UFormGroup>
-        <template #footer>
-          <UButton type="submit" color="black">
-            Save password
-          </UButton>
-        </template>
-      </UCard>
-    </template>
-  </UTabs>
-</template>

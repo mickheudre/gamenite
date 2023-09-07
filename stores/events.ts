@@ -13,10 +13,18 @@ export const useEventsStore = defineStore('eventsStore', () => {
     })
     
     const addEvent = async (event) => {
-        console.log(event)
         const { error } = await supabase
         .from('events')
         .insert({...event, org: 1, organizer: user.value.id})
+    }
+
+    const updateEvent = async (event) => {
+        console.log(event)
+        const { error } = await supabase
+        .from('events')
+        .update(event)
+        .eq('id', event.id)
+        refresh()
     }
 
     const deleteEvent = async (eventId: string) => {
@@ -24,11 +32,11 @@ export const useEventsStore = defineStore('eventsStore', () => {
         .from('events')
         .delete()
         .eq('id', eventId)
+
         refresh()
 
-        console.log(error)
     }
     
     
-    return { events, pending, refresh, addEvent, deleteEvent }
+    return { events, pending, refresh, addEvent, updateEvent, deleteEvent }
 })

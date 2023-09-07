@@ -5,19 +5,23 @@
                 <h4 class="capitalize">événements</h4>
             </template>
             <template #footer>
-                <UButton v-if="userCanManageEvent" icon="i-heroicons-plus" @click="isOpen = !isOpen">Proposer un événement</UButton>
+                <UButton v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate') ?? false" icon="i-heroicons-plus" @click="isOpen = true">Proposer un événement</UButton>
             </template>
-            <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="userCanManageEvent ? columnsAdmin : columnsGuest" :sort="{ column: 'start_at',  direction: 'asc' }">
-                <template #start_at-data="{row}">
-                    <span>{{ formatDate(row.start_at) }}</span>
-                </template>
-                <template #actions-data="{ row }" >
-                    <UDropdown :items="items(row)">
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-                    </UDropdown>
-                </template>
-            </UTable>
+            <EventList @showDetails="showDetails" @edit-event="editEvent"/>
             
+            
+            <UModal v-model="showDetailsModal">
+                <UCard>
+                    <template #header>
+                        <div class="flex justify-between">
+                            <h4>{{currentEvent?.name  }}</h4>
+                            <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDate(currentEvent.start_at)" />
+                        </div>
+                    </template>
+                    <span>{{ currentEvent?.description }}</span>
+                    
+                </UCard>
+            </UModal>
         </UCard>
         <UCard class="my-8">
             <vue-cal v-if="!loading && !userCanManageEvent"
@@ -26,7 +30,8 @@
             hide-view-selector
             :time-from="9 * 60"
             :time-to="24 * 60"
-            :disable-views="['years', 'year', 'month', 'day']">
+            :disable-views="['years', 'year', 'month', 'day']"
+            :on-event-click="onEventClick">
         </vue-cal>
         <vue-cal v-if="!loading && userCanManageEvent"
         locale="fr"
@@ -39,25 +44,12 @@
         :editable-events="{ title: true, drag: true, resize: true, delete: true, create: true }"
         :drag-to-create-threshold="0"
         @event-create="onEventCreate"
-        @event-drag-create="isOpen = true">
-        
+        @event-drag-create="isOpen = true"
+        :on-event-click="onEventClick">
     </vue-cal>
     
 </UCard>
-<USlideover v-model="isOpen">
-    <UFormGroup label="Nom" name="name">
-        <UInput v-model="newEventState.name" />
-    </UFormGroup>
-    <UFormGroup label="Date" name="date">
-        <UInput type="datetime-local" v-model="newEventState.start" />
-        <UInput type="datetime-local" v-model="newEventState.end" />
-    </UFormGroup>
-    <UFormGroup label="Description" name="description">
-        <UTextarea />
-    </UFormGroup>
-    <UButton @click="cancelEvent()">Cancel</UButton>
-    <UButton @click="submitEvent()">Ajouter</UButton>
-</USlideover>
+<EventEditor v-model="isOpen" :event="newEventState" @cancel="isOpen = false" @edit-event="updateEvent" @create-event="submitEvent"/>
 
 </UContainer>
 </template>
@@ -85,34 +77,18 @@ openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "
 
 
 
+const currentEvent = ref(null)
+const showDetailsModal = ref(false)
 
-const columnsGuest = [{
-    label: 'Nom',
-    key: 'name'
-},
-{
-    label: 'Date',
-    key: 'start_at',
-    sortable: true
+const showDetails = (event) => {
+    showDetailsModal.value = true
+    currentEvent.value = event
 }
-]
-
-const columnsAdmin = [{
-    label: 'Nom',
-    key: 'name'
-},
-{
-    label: 'Date',
-    key: 'start_at',
-    sortable: true
-},
-{
-    key: "actions"
-}
-]
-
 const newEventState = ref({
+    mode: "create",
     name: "Nouvel Evénement",
+    id: null,
+    description: "",
     start: new Date().toISOString().slice(0, 19),
     end: new Date().toISOString().slice(0, 19)
 })
@@ -141,29 +117,43 @@ const cancelEvent = () => {
         newEvent.value.deleteFunction()
     }
 }
+
+const editEvent = (event) => {
+    newEventState.value.mode = 'edit'
+    newEventState.value.id = event.id
+    newEventState.value.name = event.name
+    newEventState.value.description = event.description
+    const eventStart = new Date(event.start_at)
+    eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
+    const eventEnd = new Date(event.end_at)
+    eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
+    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
+    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
+    isOpen.value = true
+}
+
+const updateEvent = async (event) => {
+    await eventsStore.updateEvent({id: newEventState.value.id, name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
+    isOpen.value = false
+
+
+}
+
 const submitEvent = () => {
-    eventsStore.addEvent({name: newEventState.value.name, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
+    eventsStore.addEvent({name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
     isOpen.value = false
 }
 
-const items = (row) => [
-// [{
-//     label: "Mofifier l'évenement",
-//     icon: 'i-heroicons-pencil-square-20-solid',
-//     click: () => console.log('Edit', row.id)
-// }], 
-[{
-    label: "Supprimer",
-    icon: 'i-heroicons-trash-20-solid',
-    click: () => eventsStore.deleteEvent(row.id)
-}]
-]
+
 
 
 onMounted(() => {
     loading.value = false
 })
 
+const onEventClick = (event, e) => {
+    e.stopPropagation()
+}
 
 const formatDate = (date: string) => {
     const eventStart = new Date(date)
