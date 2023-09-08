@@ -170,16 +170,31 @@ const createEvent = () => {
 
 const updateEvent = async (event) => {
     
-    const {data, error} = await eventsStore.updateEvent({id: newEventState.value.id, name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-    
-    if (data) {
-        const found = eventsCal.value.find(ev => ev.id === data.id)
-        if (found) {
-            found.title = data.name
-            found.start= new Date(data.start_at)
-            found.end = new Date(data.end_at)
-            found.description = data.description
+    if (event.type === 'opening_hour') {
+        const {data, error} = await openingHoursStore.updateOpeningHour({id: newEventState.value.id, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
+        
+        if (data) {
+            const found = eventsCal.value.find(ev => ev.id === data.id)
+            if (found) {
+                found.start= new Date(data.start_at)
+                found.end = new Date(data.end_at)
+            }
         }
+    }    
+    
+    if (event.type === 'event') {
+        const {data, error} = await eventsStore.updateEvent({id: newEventState.value.id, name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
+        
+        if (data) {
+            const found = eventsCal.value.find(ev => ev.id === data.id)
+            if (found) {
+                found.title = data.name
+                found.start= new Date(data.start_at)
+                found.end = new Date(data.end_at)
+                found.description = data.description
+            }
+        }
+        
     }
     
     isOpen.value = false
@@ -194,7 +209,7 @@ const deleteEvent  = async (event) => {
             eventsCal.value.splice(index, 1)
         }
     }
-
+    
     if (event.type === 'opening_hour') {
         await openingHoursStore.deleteOpeningHour(event.id)
         const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'opening_hour')
@@ -217,13 +232,13 @@ const submitEvent = async () => {
             newEvent.event.id = data.id
             eventsCal.value.push(newEvent.event)
         }
-
+        
         isOpen.value = false
         newEvent.event = null
         newEvent.deleteFunction = null
         return
     }
-
+    
     const {data, error } = await eventsStore.addEvent({name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
     
     if (newEvent.event) {
