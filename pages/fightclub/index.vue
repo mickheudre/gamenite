@@ -49,7 +49,7 @@
     </vue-cal>
     
 </UCard>
-<EventEditor v-model="isOpen" :event="newEventState" @edit-event="updateEvent" @create-event="submitEvent" @cancel="cancelEvent"/>
+<EventEditor v-model="isOpen" :event="newEventState" @edit-event="updateEvent" @create-event="submitEvent" @delete-event="deleteEvent" @cancel="cancelEvent"/>
 
 </UContainer>
 </template>
@@ -70,8 +70,8 @@ const openingHoursStore = useOpeningHoursStore()
 const eventsCal = ref([])
 
 
-eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, class: "demo_event"}))
-openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), class: "opening_hour", background: true}))
+eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "demo_event"}))
+openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
 
 
 
@@ -178,6 +178,7 @@ const updateEvent = async (event) => {
             found.title = data.name
             found.start= new Date(data.start_at)
             found.end = new Date(data.end_at)
+            found.description = data.description
         }
     }
     
@@ -187,9 +188,13 @@ const updateEvent = async (event) => {
 
 const deleteEvent  = async (event) => {
     await eventsStore.deleteEvent(event.id)
-    
-    const index = eventsCal.value.findIndex(ev => ev.id === event.id)
-    eventsCal.value.splice(index, 1)
+    console.log(eventsCal.value)
+    const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'demo_event')
+    console.log(index)
+    if (index != -1) {
+        eventsCal.value.splice(index, 1)
+    }
+    isOpen.value = false
     
 }
 
@@ -229,6 +234,18 @@ onMounted(() => {
 })
 
 const onEventClick = (event, e) => {
+    newEventState.value.mode = 'edit'
+    newEventState.value.type = event.class
+    newEventState.value.id = event.id
+    newEventState.value.name = event.title
+    newEventState.value.description = event.description
+    const eventStart = new Date(event.start)
+    eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
+    const eventEnd = new Date(event.end)
+    eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
+    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
+    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
+    isOpen.value = true    
     e.stopPropagation()
 }
 

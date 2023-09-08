@@ -9,7 +9,9 @@
         <template #item="{item}">
           <UCard>
             <template #header>
-              <h3>{{ item.label }}</h3>
+              <div>
+                <h3>{{ item.label }}</h3>
+              </div>
             </template>
             <div v-if="item.key === 'event'">
               <UFormGroup label="Nom" name="name">
@@ -41,7 +43,10 @@
       <div v-if="props.event.mode == 'edit'">
         <UCard>
             <template #header>
-              <h3>Modifier l'événement</h3>
+              <div class="flex justify-between">
+                <h3>Modifier l'événement</h3>
+                <UButton icon="i-heroicons-trash-20-solid" color="red" @click="emit('deleteEvent', props.event)"/>
+              </div>
             </template>
             <div>
               <UFormGroup label="Nom" name="name">
@@ -70,7 +75,7 @@
 
 <script setup>
 const props = defineProps(['event'])
-const emit = defineEmits(['cancel', 'createEvent', 'editEvent'])
+const emit = defineEmits(['cancel', 'createEvent', 'editEvent', 'deleteEvent'])
 
 const validate = (eventType) => {
 
