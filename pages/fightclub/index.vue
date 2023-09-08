@@ -30,8 +30,7 @@
             hide-view-selector
             :time-from="9 * 60"
             :time-to="24 * 60"
-            :disable-views="['years', 'year', 'month', 'day']"
-            :on-event-click="onEventClick">
+            :disable-views="['years', 'year', 'month', 'day']">
         </vue-cal>
         <vue-cal v-if="!loading && userCanManageEvent"
         locale="fr"
@@ -263,18 +262,19 @@ onMounted(() => {
 })
 
 const onEventClick = (event, e) => {
-    newEventState.value.mode = 'edit'
-    newEventState.value.type = event.class === 'opening_hour' ? 'opening_hour' : 'event'
-    newEventState.value.id = event.id
-    newEventState.value.name = event.title
-    newEventState.value.description = event.description
-    const eventStart = new Date(event.start)
-    eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
-    const eventEnd = new Date(event.end)
-    eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
-    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
-    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
-    isOpen.value = true    
+        newEventState.value.mode = 'edit'
+        newEventState.value.type = event.class === 'opening_hour' ? 'opening_hour' : 'event'
+        newEventState.value.id = event.id
+        newEventState.value.name = event.title
+        newEventState.value.description = event.description
+        const eventStart = new Date(event.start)
+        eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
+        const eventEnd = new Date(event.end)
+        eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
+        newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
+        newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
+        isOpen.value = true    
+    
     e.stopPropagation()
 }
 
@@ -285,13 +285,7 @@ const formatDate = (date: string) => {
 }
 
 const userCanManageEvent = computed(() => {
-    const roles = userStore.profile?.roles
-    if (roles?.length > 0) {
-        if (roles.find(role => (role.org.id == 1) && role.roles.find(role => role === 'admin') )) {
-            return true
-        }
-    }
-    return false
+  return userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate')
 })
 </script>
 
