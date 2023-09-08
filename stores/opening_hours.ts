@@ -25,6 +25,25 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         return {data, error}
     }
 
+    const deleteOpeningHour = async (eventId: string) => {
+        const { data, error } = await supabase
+        .from('opening_hours')
+        .delete()
+        .eq('id', eventId)
+        .select()
+        .single()
+
+        if (data) {
+            const index = openingHours.value.findIndex(event => event.id === data.id)
+            if (index != -1) {
+                openingHours.value?.splice(index, 1)
+            }
+            }
+            console.log(eventId, error)
+        return  {data, error}
+
+
+    }
     
-    return { openingHours, pending, refresh, addOpeningHour }
+    return { openingHours, pending, refresh, addOpeningHour, deleteOpeningHour }
 })

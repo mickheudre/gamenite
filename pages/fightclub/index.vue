@@ -187,13 +187,22 @@ const updateEvent = async (event) => {
 }
 
 const deleteEvent  = async (event) => {
-    await eventsStore.deleteEvent(event.id)
-    console.log(eventsCal.value)
-    const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'demo_event')
-    console.log(index)
-    if (index != -1) {
-        eventsCal.value.splice(index, 1)
+    if (event.type === 'event') {
+        await eventsStore.deleteEvent(event.id)
+        const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'demo_event')
+        if (index != -1) {
+            eventsCal.value.splice(index, 1)
+        }
     }
+
+    if (event.type === 'opening_hour') {
+        await openingHoursStore.deleteOpeningHour(event.id)
+        const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'opening_hour')
+        if (index != -1) {
+            eventsCal.value.splice(index, 1)
+        }
+    }
+    
     isOpen.value = false
     
 }
@@ -202,21 +211,26 @@ const submitEvent = async () => {
     
     if (newEventState.value.type === "opening_hour") {
         const {data, error} = await openingHoursStore.addOpeningHour({start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-        
         if (data && newEvent.event) {
             newEvent.event.title = "Ouvert"
             newEvent.event.class = "opening_hour"
+            newEvent.event.id = data.id
+            eventsCal.value.push(newEvent.event)
         }
+
         isOpen.value = false
         newEvent.event = null
         newEvent.deleteFunction = null
         return
     }
+
     const {data, error } = await eventsStore.addEvent({name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
     
     if (newEvent.event) {
         newEvent.event.title = data.name
         newEvent.event.class = "demo_event"
+        newEvent.event.id = data.id
+        eventsCal.value.push(newEvent.event)
     } else {
         eventsCal.value.push({ title: data.name, start: new Date(data.start_at), end: new Date(data.end_at),id: data.id, class: "demo_event"})
     }
@@ -235,7 +249,7 @@ onMounted(() => {
 
 const onEventClick = (event, e) => {
     newEventState.value.mode = 'edit'
-    newEventState.value.type = event.class
+    newEventState.value.type = event.class === 'opening_hour' ? 'opening_hour' : 'event'
     newEventState.value.id = event.id
     newEventState.value.name = event.title
     newEventState.value.description = event.description

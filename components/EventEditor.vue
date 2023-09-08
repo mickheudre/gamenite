@@ -44,19 +44,21 @@
         <UCard>
             <template #header>
               <div class="flex justify-between">
-                <h3>Modifier l'événement</h3>
+                <h3 v-if="props.event.type === 'event'">Modifier l'événement</h3>
+                <h3 v-if="props.event.type === 'opening_hour'">Modifier l'horaire d'ouverture</h3>
+
                 <UButton icon="i-heroicons-trash-20-solid" color="red" @click="emit('deleteEvent', props.event)"/>
               </div>
             </template>
             <div>
-              <UFormGroup label="Nom" name="name">
+              <UFormGroup v-if="props.event.type === 'event'" label="Nom" name="name">
                 <UInput v-model="props.event.name" />
               </UFormGroup>
               <UFormGroup label="Date" name="date">
                 <UInput type="datetime-local" v-model="props.event.start" />
                 <UInput type="datetime-local" v-model="props.event.end" />
               </UFormGroup>
-              <UFormGroup label="Description" name="description">
+              <UFormGroup v-if="props.event.type === 'event'" label="Description" name="description">
                 <UTextarea v-model="props.event.description"/>
               </UFormGroup>
             </div>
