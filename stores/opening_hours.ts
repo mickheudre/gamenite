@@ -12,7 +12,19 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         return data
     })
     
+    const addOpeningHour = async (openingHour) => {
+        const { data, error } = await supabase
+        .from('opening_hours')
+        .insert({...openingHour, org: 1, key_holder: user.value.id})
+        .select()
+        .single()
+
+        if (data) {
+            openingHours.value?.push(data)
+        }
+        return {data, error}
+    }
 
     
-    return { openingHours, pending, refresh }
+    return { openingHours, pending, refresh, addOpeningHour }
 })
