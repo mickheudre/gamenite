@@ -57,6 +57,8 @@
 import { useEventsStore } from '~/stores/events';
 import { useUserStore } from '~/stores/user'
 import { useOpeningHoursStore} from '~/stores/opening_hours'
+import { storeToRefs } from 'pinia'
+
 
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
@@ -66,11 +68,12 @@ const user = useSupabaseUser()
 const eventsStore = useEventsStore()
 const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
+const {openingHours, pending} = storeToRefs(openingHoursStore)
 const eventsCal = ref([])
 
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "demo_event"}))
-openingHoursStore.openingHours?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
+openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
 
 
 

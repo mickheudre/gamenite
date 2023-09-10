@@ -60,7 +60,6 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
                 openingHours.value?.splice(index, 1)
             }
         }
-        console.log(eventId, error)
         return  {data, error}
         
         
