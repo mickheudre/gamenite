@@ -1,5 +1,5 @@
 <template>
-    <UTable :loading="eventsStore.pending" :rows="eventsStore.events" :columns="userStore.profile?.permissions['fightClub'].find(p => p == 'eventDelete') ? columnsAdmin : columnsGuest" :sort="{ column: 'start_at',  direction: 'asc' }">
+    <UTable :loading="eventsStore.pending" :rows="eventsStore.incomingEvents" :columns="userStore.profile?.permissions['fightClub'].find(p => p == 'eventDelete') ? columnsAdmin : columnsGuest" :sort="{ column: 'start_at',  direction: 'asc' }">
         <template #name-data="{row}">
             <UButton @click="$emit('showDetails', row)" variant="link">{{row.name}}</UButton>
         </template>

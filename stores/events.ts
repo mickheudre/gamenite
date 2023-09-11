@@ -11,6 +11,10 @@ export const useEventsStore = defineStore('eventsStore', () => {
         const events = ref([])
         return data
     })
+
+    const incomingEvents = computed(() => {
+        return events.value?.filter(event => new Date(event.start_at) > new Date())
+    })
     
     const addEvent = async (event) => {
         const { data, error } = await supabase
@@ -65,5 +69,5 @@ export const useEventsStore = defineStore('eventsStore', () => {
     }
     
     
-    return { events, pending, refresh, addEvent, updateEvent, deleteEvent }
+    return { events, incomingEvents, pending, refresh, addEvent, updateEvent, deleteEvent }
 })
