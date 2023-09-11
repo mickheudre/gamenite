@@ -48,7 +48,7 @@
     </vue-cal>
     
 </UCard>
-<EventEditor v-model="isOpen" :event="newEventState" @edit-event="updateEvent" @create-event="submitEvent" @delete-event="deleteEvent" @cancel="cancelEvent"/>
+<EventEditor v-model="isOpen" :event="newEventState" @edit-event="updateEvent" @create-event="submitEvent" @delete-event="deleteItem" @cancel="cancelEvent"/>
 
 </UContainer>
 </template>
@@ -62,7 +62,6 @@ import { storeToRefs } from 'pinia'
 
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
-import { _1 } from '#tailwind-config/theme/aspectRatio';
 
 const user = useSupabaseUser()
 const eventsStore = useEventsStore()
@@ -216,21 +215,29 @@ const updateEvent = async (event) => {
     
 }
 
-const deleteEvent  = async (event) => {
-    if (event.type === 'event') {
-        await eventsStore.deleteEvent(event.id)
+const deleteEvent = async (event) => {
+    await eventsStore.deleteEvent(event.id)
         const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'demo_event')
         if (index != -1) {
             eventsCal.value.splice(index, 1)
         }
-    }
-    
-    if (event.type === 'opening_hour') {
-        await openingHoursStore.deleteOpeningHour(event.id)
+}
+
+const deleteOpeningHour = async (event) => {
+    await openingHoursStore.deleteOpeningHour(event.id)
         const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'opening_hour')
         if (index != -1) {
             eventsCal.value.splice(index, 1)
         }
+}
+
+const deleteItem  = async (event) => {
+    if (event.type === 'event') {
+       await deleteEvent(event)
+    }
+    
+    if (event.type === 'opening_hour') {
+       await deleteOpeningHour(event)
     }
     
     isOpen.value = false
