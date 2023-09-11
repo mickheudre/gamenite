@@ -17,6 +17,10 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         return data
     })
 
+    const incomingOpeningHours = computed(() => {
+        return openingHours.value?.filter(opening =>  new Date() < new Date(opening.end_at))
+    })
+
     const userOpeningHours = computed(() => {
         const now = new Date()
         now.setHours(0)
@@ -84,5 +88,5 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
 
     }
     
-    return { openingHours, userOpeningHours, isCurrentlyOpen, pending, refresh, addOpeningHour, updateOpeningHour, deleteOpeningHour }
+    return { openingHours, incomingOpeningHours, userOpeningHours, isCurrentlyOpen, pending, refresh, addOpeningHour, updateOpeningHour, deleteOpeningHour }
 })
