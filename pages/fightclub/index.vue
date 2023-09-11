@@ -101,6 +101,18 @@ const newEvent = reactive({event: null, deleteFunction: null})
 const loading = ref(true)
 const isOpen = ref(false)
 
+watch(isOpen, (value) => {
+    if (value === false) {
+        if (newEvent.event) {
+            newEvent.event = null
+        }
+        if (newEvent.deleteFunction) {
+            newEvent.deleteFunction()
+            newEvent.deleteFunction = null
+        }
+    }
+})
+
 const onEventCreateStart = (event, deleteEvent) => {
     if (newEvent.event == null) {
         newEvent.event = event
@@ -131,6 +143,7 @@ const cancelEvent = () => {
     }
     if (newEvent.deleteFunction) {
         newEvent.deleteFunction()
+        newEvent.deleteFunction = null
     }
 }
 
