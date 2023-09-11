@@ -125,6 +125,7 @@ const onEventCreateStart = (event, deleteEvent) => {
 const onEventCreate = (event) => {
     newEventState.value.mode = "create"
     newEventState.value.name = "Nouvel Evénement"
+    newEventState.value.type = "opening_hour"
     const eventStart = new Date(event.start)
     eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
     const eventEnd = new Date(event.end)
@@ -173,6 +174,7 @@ const createEvent = () => {
     
     newEventState.value = {
         mode: "create",
+        type: "event",
         name: "Nouvel Evénement",
         id: null,
         description: "",
@@ -253,6 +255,9 @@ const submitEvent = async () => {
             newEvent.event.class = "opening_hour"
             newEvent.event.id = data.id
             eventsCal.value.push(newEvent.event)
+        } else {
+            eventsCal.value.push({ title: "Ouvert", start: new Date(data.start_at), end: new Date(data.end_at),id: data.id, class: "opening_hour"})
+
         }
         
         isOpen.value = false

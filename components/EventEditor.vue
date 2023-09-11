@@ -5,7 +5,7 @@
         <h4>{{ props.event.mode == "edit" ? "Modifier un événement" : "Proposer un événement"}}</h4>
       </template>
       <div v-if="props.event.mode == 'create'" >
-        <UTabs ref="tabs" :items="eventType" > 
+        <UTabs ref="tabs" :items="eventType" :default-index="props.event.type == 'event' ? 1 : 0 "> 
         <template #item="{item}">
           <UCard>
             <template #header>
@@ -79,6 +79,9 @@
 const props = defineProps(['event'])
 const emit = defineEmits(['cancel', 'createEvent', 'editEvent', 'deleteEvent'])
 
+watch(() => props.event, (type) => {
+  console.log(type)
+})
 const validate = (eventType) => {
 
   if (props.event.mode == 'edit') {
