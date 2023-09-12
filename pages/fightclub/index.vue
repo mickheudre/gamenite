@@ -92,8 +92,8 @@ const newEventState = ref({
     name: "Nouvel Evénement",
     id: null,
     description: "",
-    start: new Date().toISOString().slice(0, 19),
-    end: new Date().toISOString().slice(0, 19)
+    start: new Date(),
+    end: new Date()
 })
 
 const newEvent = reactive({event: null, deleteFunction: null})
@@ -127,11 +127,11 @@ const onEventCreate = (event) => {
     newEventState.value.name = "Nouvel Evénement"
     newEventState.value.type = "opening_hour"
     const eventStart = new Date(event.start)
-    eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
+    eventStart.setMinutes(eventStart.getMinutes() )
     const eventEnd = new Date(event.end)
-    eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
-    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
-    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
+    eventEnd.setMinutes(eventEnd.getMinutes())
+    newEventState.value.start = new Date(eventStart)
+    newEventState.value.end = new Date(eventEnd)
     isOpen.value = true
     return event
 }
@@ -156,19 +156,19 @@ const editEvent = (event) => {
     eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
     const eventEnd = new Date(event.end_at)
     eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
-    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
-    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
+    newEventState.value.start = new Date(eventStart)
+    newEventState.value.end = new Date(eventEnd)
     isOpen.value = true
 }
 
 
 const createEvent = () => {
     const startDate = new Date()
-    startDate.setUTCHours(10)
+    startDate.setUTCHours(8)
     startDate.setMinutes(0)
     startDate.setSeconds(0)
     const endDate = new Date()
-    endDate.setUTCHours(18)
+    endDate.setUTCHours(16)
     endDate.setMinutes(0)
     endDate.setSeconds(0)
     
@@ -178,8 +178,8 @@ const createEvent = () => {
         name: "Nouvel Evénement",
         id: null,
         description: "",
-        start: startDate.toISOString().slice(0, 19),
-        end: endDate.toISOString().slice(0, 19)
+        start: startDate,
+        end: endDate
     }
     isOpen.value = true
 }

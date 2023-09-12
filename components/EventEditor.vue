@@ -18,17 +18,32 @@
                 <UInput v-model="props.event.name" />
               </UFormGroup>
               <UFormGroup label="Date" name="date">
-                <UInput type="datetime-local" v-model="props.event.start" />
-                <UInput type="datetime-local" v-model="props.event.end" />
+                <DatePicker v-model="props.event.start" :on-update:model-value="props.event.end.setDate(props.event.start.getDate())"/>
               </UFormGroup>
+              <UFormGroup label="Horaires">
+                <div class="flex items-center">
+                <TimePicker v-model="props.event.start" />
+                <span class="mx-2">→</span>
+                <TimePicker v-model="props.event.end" />
+                </div>
+                
+              </UFormGroup>
+             
               <UFormGroup label="Description" name="description">
                 <UTextarea v-model="props.event.description"/>
               </UFormGroup>
             </div>
             <div v-if="item.key === 'opening_hour'">
               <UFormGroup label="Date" name="date">
-                <UInput type="datetime-local" v-model="props.event.start" />
-                <UInput type="datetime-local" v-model="props.event.end" />
+                <DatePicker v-model="props.event.start" :on-update:model-value="props.event.end.setDate(props.event.start.getDate())"/>
+              </UFormGroup>
+              <UFormGroup label="Horaires">
+                <div class="flex items-center">
+                <TimePicker v-model="props.event.start" />
+                <span class="mx-2">→</span>
+                <TimePicker v-model="props.event.end" />
+                </div>
+                
               </UFormGroup>
             </div>
             <template #footer>
@@ -79,9 +94,10 @@
 const props = defineProps(['event'])
 const emit = defineEmits(['cancel', 'createEvent', 'editEvent', 'deleteEvent'])
 
-watch(() => props.event, (type) => {
-  console.log(type)
-})
+
+const eventDay = ref(props.event.start)
+const eventDayEnd = ref(props.event.end)
+
 const validate = (eventType) => {
 
   if (props.event.mode == 'edit') {
@@ -105,5 +121,7 @@ const eventType = [
   label: 'Evénement'
 }
 ]
+
+
 
 </script>
