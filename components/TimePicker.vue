@@ -1,10 +1,10 @@
 <template>
-<UInput v-model="displayTime" type="time" />
+<UInput v-model="props.modelValue" type="time" />
 </template>
 
 <script setup lang="ts">
 
-const props = defineProps({modelValue: Date})
+const props = defineProps({modelValue: String})
 const emit =  defineEmits(['update:modelValue'])
 
 console.log(props.modelValue)

@@ -1,6 +1,6 @@
 <template>
     <UPopover>
-        <UButton icon="i-heroicons-calendar-days-20-solid" color="gray" class="capitalize" :label="formatDate(props.modelValue)" />
+        <UButton icon="i-heroicons-calendar-days-20-solid" color="white" class="capitalize" :label="formatDate(props.modelValue)" />
         <template #panel>
             <vue-cal
             locale="fr"
