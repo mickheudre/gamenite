@@ -13,8 +13,8 @@
                   <UButton v-if="props.eventRequest?.mode === 'edit'" icon="i-heroicons-trash-20-solid" color="red" @click="deleteEvent"/>                
                 </div>
               </template>
-                <EventEditorForm v-if="item.key === 'event'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')"/>
-                <OpeningHourEditorForm v-if="item.key === 'opening_hour'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')"/>
+                <EventEditorForm v-if="item.key === 'event'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')" :loading="props.loading"/>
+                <OpeningHourEditorForm v-if="item.key === 'opening_hour'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')" :loading="props.loading"/>
       
             </UCard>
             
@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { BasicEvent, EventEditionRequest } from '~/types/global';
 
-const props = defineProps<{eventRequest: EventEditionRequest}>()
+const props = defineProps<{eventRequest: EventEditionRequest, loading: Boolean}>()
 
 const emit = defineEmits<{
   update: [value: EventEditionRequest],

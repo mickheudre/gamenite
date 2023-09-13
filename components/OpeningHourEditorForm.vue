@@ -15,7 +15,7 @@
         </div>
     </UFormGroup>
     <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
-    <UButton type="submit">Valider</UButton>
+    <UButton type="submit" :loading="props.loading">Valider</UButton>
 </UForm>
 
 </template>
@@ -28,7 +28,9 @@ import type { FormError, FormSubmitEvent } from '@nuxt/ui/dist/runtime/types'
 import { EventEditionRequest } from '~/types/global';
 
 const props = defineProps({
-    eventRequest: Object as PropType<EventEditionRequest>
+    eventRequest: Object as PropType<EventEditionRequest>,
+        loading: Boolean
+
     })
     const emit = defineEmits(['eventRequest', 'cancel'])
     

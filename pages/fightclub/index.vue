@@ -48,7 +48,7 @@
     </vue-cal>
     
 </UCard>
-<EventEditor v-model="isOpen" :event-request="eventRequest" @update="handleEventRequest" @cancel="cancelEvent"/>
+<EventEditor v-model="isOpen" :event-request="eventRequest" @update="handleEventRequest" @cancel="cancelEvent" :loading="awaitingForResponse"/>
 
 </UContainer>
 </template>
@@ -64,7 +64,6 @@ import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 import { BasicEvent, BasicOpeningHour, EventEditionRequest } from '~/types/global';
 
-const user = useSupabaseUser()
 const eventsStore = useEventsStore()
 const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
@@ -76,7 +75,7 @@ eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, 
 openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
 
 
-
+const awaitingForResponse = ref(false)
 
 
 const currentEvent = ref(null)
@@ -86,16 +85,6 @@ const showDetails = (event) => {
     showDetailsModal.value = true
     currentEvent.value = event
 }
-
-const newEventState = ref({
-    mode: "create",
-    type: "event",
-    name: "Nouvel Evénement",
-    id: null,
-    description: "",
-    start: new Date(),
-    end: new Date()
-})
 
 
 const eventRequest : Ref<EventEditionRequest | null> = ref(null)
@@ -185,39 +174,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         isOpen.value = true
     }
     
-    const updateEvent = async (event) => {
-        
-        if (event.type === 'opening_hour') {
-            const {data, error} = await openingHoursStore.updateOpeningHour({id: newEventState.value.id, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-            
-            if (data) {
-                const found = eventsCal.value.find(ev => ev.id === data.id)
-                if (found) {
-                    found.start= new Date(data.start_at)
-                    found.end = new Date(data.end_at)
-                }
-            }
-        }    
-        
-        if (event.type === 'event') {
-            const {data, error} = await eventsStore.updateEvent({id: newEventState.value.id, name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-            
-            if (data) {
-                const found = eventsCal.value.find(ev => ev.id === data.id)
-                if (found) {
-                    found.title = data.name
-                    found.start= new Date(data.start_at)
-                    found.end = new Date(data.end_at)
-                    found.description = data.description
-                }
-            }
-            
-        }
-        
-        isOpen.value = false
-        
-    }
-    
+   
     const deleteEvent = async (eventId) => {
         await eventsStore.deleteEvent(eventId)
         const index = eventsCal.value.findIndex(ev => ev.id === eventId && ev.class === 'event')
@@ -242,8 +199,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     }
     
     const handleEventRequest = async (eventRequest: EventEditionRequest) => {
-        
-        console.log(eventRequest)
+        awaitingForResponse.value = true
         if (eventRequest.mode === 'create') {
             
             if (eventRequest.event) {
@@ -278,7 +234,6 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
             }
             
         }
-        console.log(eventRequest)
         if (eventRequest.mode === 'edit') {
             
             if (eventRequest.event && eventRequest.id) {
@@ -328,7 +283,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         }
         
         
-        
+        awaitingForResponse.value = false
         isOpen.value = false
         newCalEventObject.event = null
         newCalEventObject.deleteFunction = null
