@@ -33,19 +33,19 @@
 import type { PropType } from 'vue'
 
 import type { FormError, FormSubmitEvent } from '@nuxt/ui/dist/runtime/types'
-import { BasicEvent } from '~/types/global';
+import { EventEditionRequest } from '~/types/global';
 
 const props = defineProps({
-    event: Object as PropType<BasicEvent>
+    eventRequest: Object as PropType<EventEditionRequest>
     })
-const emit = defineEmits(['eventRequest', 'eventUpdated', 'cancel'])
+const emit = defineEmits(['eventRequest', 'cancel'])
 
 const state = ref({
-    name: props.event?.name ?? "Nouvel Evénement",
-    date: props.event?.date ?? new Date(),
-    start: props.event?.start ?? "10:00",
-    end: props.event?.end ?? "18:00",
-    description: props.event?.description ?? undefined
+    name: props.eventRequest?.event?.name ?? "Nouvel Evénement",
+    date: props.eventRequest?.event?.date ?? new Date(),
+    start: props.eventRequest?.event?.start ?? "10:00",
+    end: props.eventRequest?.event?.end ?? "18:00",
+    description: props.eventRequest?.event?.description ?? undefined
 })
 
 const validateEvent = (state: any): FormError[] => {
@@ -56,12 +56,8 @@ const validateEvent = (state: any): FormError[] => {
 }
 
 async function submit (event: FormSubmitEvent<any>) {
-    if (props.event) {
-        emit('eventRequest', {event: state, type: 'event', mode: 'edit'} )
-    } else {
-        emit ('eventRequest', {event: state, type: 'event', mode: 'create'})
-    }
-    
+        emit('eventRequest', {event: Object.assign({}, state.value), id: props.eventRequest?.id ?? undefined,  type: 'event', mode: props.eventRequest?.mode ?? 'create'} )
+
 }
 
 

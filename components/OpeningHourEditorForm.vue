@@ -25,33 +25,28 @@
 
 import { ref } from 'vue'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui/dist/runtime/types'
-import { BasicEvent } from '~/types/global';
+import { EventEditionRequest } from '~/types/global';
 
 const props = defineProps({
-    event: Object as PropType<BasicEvent>
+    eventRequest: Object as PropType<EventEditionRequest>
     })
-const emit = defineEmits(['eventRequest', 'cancel'])
-
-const state = ref({
-    date: props.event?.date ?? new Date(),
-    start: props.event?.start ?? "10:00",
-    end: props.event?.end ?? "18:00"
-})
-
-const validateEvent = (state: any): FormError[] => {
-    const errors = []
-    if (state.start > state.end) errors.push({path: 'time', message:"Horaires incohérents"})
-    return errors
-}
-
-async function submit (event: FormSubmitEvent<any>) {
-    if (props.event) {
-        emit('eventRequest', {event: state, type: 'opening_hour', mode: 'edit'})
-    } else {
-        emit ('eventRequest', {event: state, type: 'opening_hour', mode: 'create'})
+    const emit = defineEmits(['eventRequest', 'cancel'])
+    
+    const state = ref({
+        date: props.eventRequest?.event?.date ?? new Date(),
+        start: props.eventRequest?.event?.start ?? "10:00",
+        end: props.eventRequest?.event?.end ?? "18:00"
+    })
+    
+    const validateEvent = (state: any): FormError[] => {
+        const errors = []
+        if (state.start > state.end) errors.push({path: 'time', message:"Horaires incohérents"})
+        return errors
     }
     
-}
-
-
+    async function submit (event: FormSubmitEvent<any>) {
+        emit('eventRequest', {event: Object.assign({}, state.value), id: props.eventRequest?.id ?? undefined, type: 'opening_hour', mode: props.eventRequest?.mode ?? "create"})
+    }
+    
+    
 </script>

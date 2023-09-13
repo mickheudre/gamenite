@@ -4,7 +4,7 @@
       <template #header>
         <h4>{{ props.eventRequest?.mode === 'edit' ? "Modifier un événement" : "Proposer un événement"}}</h4>
       </template>
-        <UTabs ref="tabs" :items="eventType"> 
+        <UTabs ref="tabs" :items="eventType" :default-index="props.eventRequest.type == 'event' ? 1 : 0"> 
           <template #item="{item}">
             <UCard>
               <template #header>
@@ -13,8 +13,8 @@
                   <UButton v-if="props.eventRequest?.mode === 'edit'" icon="i-heroicons-trash-20-solid" color="red" @click="deleteEvent"/>                
                 </div>
               </template>
-                <EventEditorForm v-if="item.key === 'event'" :event="eventRequest.event"  @event-request="handleEventRequest" @cancel="emit('cancel')"/>
-                <OpeningHourEditorForm v-if="item.key === 'opening_hour'" :event="eventRequest.event"  @event-request="handleEventRequest" @cancel="emit('cancel')"/>
+                <EventEditorForm v-if="item.key === 'event'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')"/>
+                <OpeningHourEditorForm v-if="item.key === 'opening_hour'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')"/>
       
             </UCard>
             
@@ -45,7 +45,7 @@ const handleEventRequest= (request : EventEditionRequest) => {
 const deleteEvent = () => {
   emit('update', {
     mode: 'delete',
-    type: 'event',
+    type: props.eventRequest.type,
     id: props.eventRequest.id
   })
 }
@@ -60,7 +60,6 @@ const eventType = computed(() => [
   key: 'event',
   label: 'Evénement',
   disabled: props.eventRequest.mode == 'edit' && props.eventRequest.type == 'opening_hour'
-
 }
 ])
 
