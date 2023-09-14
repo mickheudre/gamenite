@@ -10,7 +10,7 @@
             <template #header>
               <div class="flex justify-between">
                 <h3>{{ item.label }}</h3>
-                <UButton v-if="props.eventRequest?.mode === 'edit'" icon="i-heroicons-trash-20-solid" color="red" @click="deleteEvent"/>                
+                <UButton v-if="props.eventRequest?.mode === 'edit'" icon="i-heroicons-trash" color="red" @click="deleteEvent"/>                
               </div>
             </template>
             <EventEditorForm v-if="item.key === 'event'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')" :loading="props.loading"/>
@@ -53,7 +53,13 @@ const deleteEvent = () => {
 
 const eventType = computed(() => {
   const types = []
-  
+  if (userStore.profile?.permissions['fightClub'].find(p => p == 'openingHoursCreate')) {
+      types.push({
+      key: 'opening_hour',
+      label: "Horaires d'ouverture",
+      disabled: props.eventRequest.mode == 'edit' && props.eventRequest.type == 'event'
+    })
+    }
   if (userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate')) {
     types.push(
       {
@@ -61,13 +67,7 @@ const eventType = computed(() => {
         label: 'Evénement',
         disabled: props.eventRequest.mode == 'edit' && props.eventRequest.type == 'opening_hour'
       })}
-    if (userStore.profile?.permissions['fightClub'].find(p => p == 'openingHoursCreate')) {
-      types.push({
-      key: 'opening_hour',
-      label: "Horaires d'ouverture",
-      disabled: props.eventRequest.mode == 'edit' && props.eventRequest.type == 'event'
-    })
-    }
+   
     
     return types
   })

@@ -10,18 +10,8 @@
             <EventList @showDetails="showDetails" @edit-event="editEvent" @delete-event="deleteEvent"/>
             
             
-            <UModal v-model="showDetailsModal">
-                <UCard>
-                    <template #header>
-                        <div class="flex justify-between items-center">
-                            <h4>{{currentEvent?.name  }}</h4>
-                            <div class="border rounded-md items-center flex space-x-2 p-2"><UIcon name="i-heroicons-calendar-days-20-solid"/><span> {{ formatDate(currentEvent.start_at) }}</span></div>
-                        </div>
-                    </template>
-                    <span>{{ currentEvent?.description }}</span>
-                    
-                </UCard>
-            </UModal>
+            <EventDetailsModal v-model="showDetailsModal" :event="currentEvent">
+            </EventDetailsModal>
         </UCard>
         <UCard class="my-8">
             <vue-cal v-if="!loading && !userCanManageEvent"
@@ -48,17 +38,22 @@
 
         <template #event="{ event, view }">
             
-            <div class="vuecal__event-title my-2 md:mx-2" v-html="event.title" />
+            <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
+                <span>{{ event.title }}</span>
+                
+            </div>
             
             <small class="vuecal__event-time">
                 <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
             </small>
 
-            <div v-if="event.organizer">
-                <UTooltip :text="event.organizer.username" >
+            <div class="flex flex-col justify-end items-center h-auto">
+                <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
                     <UAvatar :alt="event.organizer.username" size="sm" />
                 </UTooltip>
+                <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton>
             </div>
+
         </template>
 
     </vue-cal>
@@ -190,7 +185,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         isOpen.value = true
     }
     
-   
+    
     const deleteEvent = async (eventId) => {
         await eventsStore.deleteEvent(eventId)
         const index = eventsCal.value.findIndex(ev => ev.id === eventId && ev.class === 'event')
@@ -238,6 +233,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 if (eventRequest.type === 'opening_hour') {
                     
                     const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate, organizer: eventRequest.event.organizer.id})
+                    console.log(data, error)
                     if (data && newCalEventObject.event) {
                         newCalEventObject.event.title = "Ouvert"
                         newCalEventObject.event.class = "opening_hour"
@@ -353,52 +349,32 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
 
 <style>
 
-.event {color: #fcf0ff;background-color: #d168ee; }
-.opening_hour {  background:
-    #fff7f0
-    repeating-linear-gradient(
-    -45deg,
-    #65b891,
-    #65b891 5px,
-    #93e5ab 5px,
-    #93e5ab 15px
-    );
+.event {
+    color: #fcf0ff;
+    background: rgb(238,174,202);
+    background: radial-gradient(circle, #f1f7e3 0%, #9c80db 100%);  
+    @apply rounded-lg;
+}
+.opening_hour { 
+    color: #fcf0ff;
+    background: rgb(50,75,69);
+    background: linear-gradient(0deg, #0C5445 0%, #4f772d 50%,#31572c 100%);
+    @apply rounded-md;
+
+}
+
+
+@media (max-width: 640px) {
+    .vuecal__time-cell-label {
+        @apply hidden 
+    };
     
-    border-color: #65b891;
-    border-width: 2px;
-    color: 4e878c}
-    
-    
-    
-    .closed {
-        background:
-        #fff7f0
-        repeating-linear-gradient(
-        -45deg,
-        rgba(255, 162, 87, 0.25),
-        rgba(255, 162, 87, 0.25) 5px,
-        rgba(255, 255, 255, 0) 5px,
-        rgba(255, 255, 255, 0) 15px
-        );
-        color: #f6984c;
-    }
-    
-    @media (min-width: 640px) {
-        .opening_hour>.vuecal__event-time  {
-            display: none;
-        }
-    }
-    @media (max-width: 640px) {
-        .vuecal__time-cell-label {
-            @apply hidden 
-        };
-        
-        .vuecal__time-column {
-            @apply w-0
-        };
-        .vuecal--view-with-time .vuecal__weekdays-headings {
-            @apply pl-0 
-        };
-    }
-    
+    .vuecal__time-column {
+        @apply w-0
+    };
+    .vuecal--view-with-time .vuecal__weekdays-headings {
+        @apply pl-0 
+    };
+}
+
 </style>

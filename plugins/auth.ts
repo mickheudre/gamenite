@@ -20,15 +20,13 @@ export default defineNuxtPlugin({
       openingHoursStore.refresh()
 
       if (event == 'SIGNED_OUT') {
-        
         return
       }
       if (event == 'PASSWORD_RECOVERY') {
         return 
       }
       if (event == 'SIGNED_IN') {
-        
-        navigateTo("/")
+        // navigateTo("/")
       }
       
     })
