@@ -48,22 +48,22 @@
     </vue-cal>
     
 </UCard>
-<EventEditor v-model="isOpen" :event="newEventState" @edit-event="updateEvent" @create-event="submitEvent" @delete-event="deleteItem" @cancel="cancelEvent"/>
+<EventEditor v-model="isOpen" :event-request="eventRequest" @update="handleEventRequest" @cancel="cancelEvent" :loading="awaitingForResponse"/>
 
 </UContainer>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { useEventsStore } from '~/stores/events';
-import { useUserStore } from '~/stores/user'
-import { useOpeningHoursStore} from '~/stores/opening_hours'
-import { storeToRefs } from 'pinia'
+import { useOpeningHoursStore } from '~/stores/opening_hours';
+import { useUserStore } from '~/stores/user';
 
 
-import VueCal from 'vue-cal'
-import 'vue-cal/dist/vuecal.css'
+import VueCal from 'vue-cal';
+import 'vue-cal/dist/vuecal.css';
+import { BasicEvent, BasicOpeningHour, EventEditionRequest } from '~/types/global';
 
-const user = useSupabaseUser()
 const eventsStore = useEventsStore()
 const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
@@ -71,11 +71,11 @@ const {openingHours, pending} = storeToRefs(openingHoursStore)
 const eventsCal = ref([])
 
 
-eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "demo_event"}))
+eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event"}))
 openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
 
 
-
+const awaitingForResponse = ref(false)
 
 
 const currentEvent = ref(null)
@@ -86,241 +86,251 @@ const showDetails = (event) => {
     currentEvent.value = event
 }
 
-const newEventState = ref({
-    mode: "create",
-    type: "event",
-    name: "Nouvel Evénement",
-    id: null,
-    description: "",
-    start: new Date().toISOString().slice(0, 19),
-    end: new Date().toISOString().slice(0, 19)
-})
 
-const newEvent = reactive({event: null, deleteFunction: null})
-const loading = ref(true)
-const isOpen = ref(false)
-
-watch(isOpen, (value) => {
-    if (value === false) {
-        if (newEvent.event) {
-            newEvent.event = null
-        }
-        if (newEvent.deleteFunction) {
-            newEvent.deleteFunction()
-            newEvent.deleteFunction = null
-        }
-    }
-})
-
-const onEventCreateStart = (event, deleteEvent) => {
-    if (newEvent.event == null) {
-        newEvent.event = event
-    }
+const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     
-    if (deleteEvent) {
-        newEvent.deleteFunction = deleteEvent
-    }
-    return event
-}
-const onEventCreate = (event) => {
-    newEventState.value.mode = "create"
-    newEventState.value.name = "Nouvel Evénement"
-    newEventState.value.type = "opening_hour"
-    const eventStart = new Date(event.start)
-    eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
-    const eventEnd = new Date(event.end)
-    eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
-    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
-    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
-    isOpen.value = true
-    return event
-}
-
-const cancelEvent = () => {
-    isOpen.value = false
-    if (newEvent.event) {
-        newEvent.event = null
-    }
-    if (newEvent.deleteFunction) {
-        newEvent.deleteFunction()
-        newEvent.deleteFunction = null
-    }
-}
-
-const editEvent = (event) => {
-    newEventState.value.mode = 'edit'
-    newEventState.value.id = event.id
-    newEventState.value.name = event.name
-    newEventState.value.description = event.description
-    const eventStart = new Date(event.start_at)
-    eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
-    const eventEnd = new Date(event.end_at)
-    eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
-    newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
-    newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
-    isOpen.value = true
-}
-
-
-const createEvent = () => {
-    const startDate = new Date()
-    startDate.setUTCHours(10)
-    startDate.setMinutes(0)
-    startDate.setSeconds(0)
-    const endDate = new Date()
-    endDate.setUTCHours(18)
-    endDate.setMinutes(0)
-    endDate.setSeconds(0)
+    // Stores a reference to the calendar item that is created by dragging on the calendar, and a function to delete it
+    const newCalEventObject = reactive({event: null, deleteFunction: null})
     
-    newEventState.value = {
-        mode: "create",
-        type: "event",
-        name: "Nouvel Evénement",
-        id: null,
-        description: "",
-        start: startDate.toISOString().slice(0, 19),
-        end: endDate.toISOString().slice(0, 19)
-    }
-    isOpen.value = true
-}
-
-const updateEvent = async (event) => {
+    const loading = ref(true)
+    const isOpen = ref(false)
     
-    if (event.type === 'opening_hour') {
-        const {data, error} = await openingHoursStore.updateOpeningHour({id: newEventState.value.id, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-        
-        if (data) {
-            const found = eventsCal.value.find(ev => ev.id === data.id)
-            if (found) {
-                found.start= new Date(data.start_at)
-                found.end = new Date(data.end_at)
+    watch(isOpen, (value) => {
+        if (value === false) {
+            if (newCalEventObject.event) {
+                newCalEventObject.event = null
+            }
+            if (newCalEventObject.deleteFunction) {
+                newCalEventObject.deleteFunction()
+                newCalEventObject.deleteFunction = null
             }
         }
-    }    
+    })
     
-    if (event.type === 'event') {
-        const {data, error} = await eventsStore.updateEvent({id: newEventState.value.id, name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
+    const onEventCreateStart = (event, deleteEvent) => {
+        if (newCalEventObject.event == null) {
+            newCalEventObject.event = event
+        }
         
-        if (data) {
-            const found = eventsCal.value.find(ev => ev.id === data.id)
-            if (found) {
-                found.title = data.name
-                found.start= new Date(data.start_at)
-                found.end = new Date(data.end_at)
-                found.description = data.description
+        if (deleteEvent) {
+            newCalEventObject.deleteFunction = deleteEvent
+        }
+        return event
+    }
+    const onEventCreate = (event) => {
+        
+        eventRequest.value = {
+            mode: 'create',
+            type: 'opening_hour',
+            event: {
+                name: "Nouvel Evénement",
+                date: new Date(event.start),
+                start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
             }
         }
         
-    }
-    
-    isOpen.value = false
-    
-}
-
-const deleteEvent = async (event) => {
-    await eventsStore.deleteEvent(event.id)
-        const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'demo_event')
-        if (index != -1) {
-            eventsCal.value.splice(index, 1)
-        }
-}
-
-const deleteOpeningHour = async (event) => {
-    await openingHoursStore.deleteOpeningHour(event.id)
-        const index = eventsCal.value.findIndex(ev => ev.id === event.id && ev.class === 'opening_hour')
-        if (index != -1) {
-            eventsCal.value.splice(index, 1)
-        }
-}
-
-const deleteItem  = async (event) => {
-    if (event.type === 'event') {
-       await deleteEvent(event)
-    }
-    
-    if (event.type === 'opening_hour') {
-       await deleteOpeningHour(event)
-    }
-    
-    isOpen.value = false
-    
-}
-
-const submitEvent = async () => {
-    
-    if (newEventState.value.type === "opening_hour") {
-        const {data, error} = await openingHoursStore.addOpeningHour({start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-        if (data && newEvent.event) {
-            newEvent.event.title = "Ouvert"
-            newEvent.event.class = "opening_hour"
-            newEvent.event.id = data.id
-            eventsCal.value.push(newEvent.event)
-        } else {
-            eventsCal.value.push({ title: "Ouvert", start: new Date(data.start_at), end: new Date(data.end_at),id: data.id, class: "opening_hour"})
-
-        }
         
+        isOpen.value = true
+        return event
+    }
+    
+    const cancelEvent = () => {
         isOpen.value = false
-        newEvent.event = null
-        newEvent.deleteFunction = null
-        return
+        if (newCalEventObject.event) {
+            newCalEventObject.event = null
+        }
+        if (newCalEventObject.deleteFunction) {
+            newCalEventObject.deleteFunction()
+            newCalEventObject.deleteFunction = null
+        }
     }
     
-    const {data, error } = await eventsStore.addEvent({name: newEventState.value.name, description: newEventState.value.description, start_at: new Date(newEventState.value.start), end_at: new Date(newEventState.value.end)})
-    
-    if (newEvent.event) {
-        newEvent.event.title = data.name
-        newEvent.event.class = "demo_event"
-        newEvent.event.id = data.id
-        eventsCal.value.push(newEvent.event)
-    } else {
-        eventsCal.value.push({ title: data.name, start: new Date(data.start_at), end: new Date(data.end_at),id: data.id, class: "demo_event"})
+    const editEvent = (event) => {
+        
+        
+        eventRequest.value = {
+            mode: 'edit',
+            type: 'event',
+            id: event.id,
+            event: {
+                name: event.name,
+                date: new Date(event.start_at),
+                start: new Date(event.start_at).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(event.end_at).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                description: event.description
+            }
+        }
+        
+        isOpen.value = true
     }
     
-    isOpen.value = false
-    newEvent.event = null
-    newEvent.deleteFunction = null
-}
-
-
-
-
-onMounted(() => {
-    loading.value = false
-})
-
-const onEventClick = (event, e) => {
-        newEventState.value.mode = 'edit'
-        newEventState.value.type = event.class === 'opening_hour' ? 'opening_hour' : 'event'
-        newEventState.value.id = event.id
-        newEventState.value.name = event.title
-        newEventState.value.description = event.description
-        const eventStart = new Date(event.start)
-        eventStart.setMinutes(eventStart.getMinutes() - eventStart.getTimezoneOffset())
-        const eventEnd = new Date(event.end)
-        eventEnd.setMinutes(eventEnd.getMinutes() - eventEnd.getTimezoneOffset())
-        newEventState.value.start = new Date(eventStart).toISOString().slice(0, 19)
-        newEventState.value.end = new Date(eventEnd).toISOString().slice(0, 19)
+    
+    const createEvent = () => {
+        eventRequest.value = {
+            mode: 'create',
+            type: 'event'
+        }
+        isOpen.value = true
+    }
+    
+   
+    const deleteEvent = async (eventId) => {
+        await eventsStore.deleteEvent(eventId)
+        const index = eventsCal.value.findIndex(ev => ev.id === eventId && ev.class === 'event')
+        if (index != -1) {
+            eventsCal.value.splice(index, 1)
+        }
+    }
+    
+    const deleteOpeningHour = async (eventId) => {
+        await openingHoursStore.deleteOpeningHour(eventId)
+        const index = eventsCal.value.findIndex(ev => ev.id === eventId && ev.class === 'opening_hour')
+        if (index != -1) {
+            eventsCal.value.splice(index, 1)
+        }
+    }
+    
+    const basicEventDateTimeToDate = (event: BasicEvent | BasicOpeningHour )  => {
+        console.log(new Date(event.date).toDateString() + ' ' + event.start)
+        const startDate : Date = new Date(new Date(event.date).toDateString() + ' ' + event.start)
+        const endDate : Date = new Date(new Date(event.date).toDateString() + ' ' + event.end)
+        return  {startDate, endDate}
+    }
+    
+    const handleEventRequest = async (eventRequest: EventEditionRequest) => {
+        awaitingForResponse.value = true
+        if (eventRequest.mode === 'create') {
+            
+            if (eventRequest.event) {
+                
+                const {startDate, endDate} = basicEventDateTimeToDate(eventRequest.event)
+                
+                if (eventRequest.type === 'event') {
+                    const {data, error } = await eventsStore.addEvent({name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
+                    if (data && newCalEventObject.event) {
+                        newCalEventObject.event.title = data.name
+                        newCalEventObject.event.class = "event"
+                        newCalEventObject.event.id = data.id
+                        eventsCal.value.push(newCalEventObject.event)
+                    } else {
+                        eventsCal.value.push({ title: data.name, start: new Date(data.start_at), end: new Date(data.end_at),id: data.id, class: "event"})
+                    }
+                }
+                if (eventRequest.type === 'opening_hour') {
+                    
+                    const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate})
+                    if (data && newCalEventObject.event) {
+                        newCalEventObject.event.title = "Ouvert"
+                        newCalEventObject.event.class = "opening_hour"
+                        newCalEventObject.event.id = data.id
+                        eventsCal.value.push(newCalEventObject.event)
+                    } else {
+                        eventsCal.value.push({ title: "Ouvert", start:  new Date(data.start_at), end: new Date(data.end_at), id: data.id, class: "opening_hour"})
+                        
+                    }
+                }
+                
+            }
+            
+        }
+        if (eventRequest.mode === 'edit') {
+            
+            if (eventRequest.event && eventRequest.id) {
+                
+                const {startDate, endDate} = basicEventDateTimeToDate(eventRequest.event)
+                
+                if (eventRequest.type === 'event') {
+                    const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
+                     console.log(data, error)
+                    if (data) {
+                        const found = eventsCal.value.find(ev => ev.id === data.id)
+                        if (found) {
+                            found.title = data.name
+                            found.start= new Date(data.start_at)
+                            found.end = new Date(data.end_at)
+                            found.description = data.description
+                        }
+                    }
+                }
+                
+                if (eventRequest.type === 'opening_hour') {
+                    const {data, error} = await openingHoursStore.updateOpeningHour({id: eventRequest.id, start_at: startDate, end_at: endDate})
+                    
+                    if (data) {
+                        const found = eventsCal.value.find(ev => ev.id === data.id)
+                        if (found) {
+                            found.start= new Date(data.start_at)
+                            found.end = new Date(data.end_at)
+                        }
+                    }
+                }
+                
+                
+            }
+            
+        }
+        
+        if (eventRequest.mode === 'delete') {
+            if (eventRequest.id) {
+                if (eventRequest.type == 'event') {
+                    deleteEvent(eventRequest.id)
+                }
+                if (eventRequest.type == 'opening_hour') {
+                    deleteOpeningHour(eventRequest.id)
+                }
+            }
+        }
+        
+        
+        awaitingForResponse.value = false
+        isOpen.value = false
+        newCalEventObject.event = null
+        newCalEventObject.deleteFunction = null
+    }
+    
+    
+    
+    
+    onMounted(() => {
+        loading.value = false
+    })
+    
+    const onEventClick = (event, e) => {
+        
+        eventRequest.value = {
+            mode: 'edit',
+            type: event.class,
+            id: event.id,
+            event: {
+                name: event.title,
+                description: event.description,
+                date: new Date(event.start),
+                start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+            }
+        }
+        
         isOpen.value = true    
+        
+        e.stopPropagation()
+    }
     
-    e.stopPropagation()
-}
-
-const formatDate = (date: string) => {
-    const eventStart = new Date(date)
+    const formatDate = (date: string) => {
+        const eventStart = new Date(date)
+        
+        return eventStart.toLocaleString('fr-FR', { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", hour12: false }) 
+    }
     
-    return eventStart.toLocaleString('fr-FR', { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", hour12: false }) 
-}
-
-const userCanManageEvent = computed(() => {
-  return userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate')
-})
+    const userCanManageEvent = computed(() => {
+        return userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate')
+    })
 </script>
 
 
 <style>
 
-.demo_event {color: #fcf0ff;background-color: #d168ee; }
+.event {color: #fcf0ff;background-color: #d168ee; }
 .opening_hour {  background:
     #fff7f0
     repeating-linear-gradient(

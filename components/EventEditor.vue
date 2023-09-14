@@ -2,108 +2,67 @@
   <USlideover>
     <UCard>
       <template #header>
-        <h4>{{ props.event.mode == "edit" ? "Modifier un événement" : "Proposer un événement"}}</h4>
+        <h4>{{ props.eventRequest?.mode === 'edit' ? "Modifier un événement" : "Proposer un événement"}}</h4>
       </template>
-      <div v-if="props.event.mode == 'create'" >
-        <UTabs ref="tabs" :items="eventType" :default-index="props.event.type == 'event' ? 1 : 0 "> 
-        <template #item="{item}">
-          <UCard>
-            <template #header>
-              <div>
-                <h3>{{ item.label }}</h3>
-              </div>
-            </template>
-            <div v-if="item.key === 'event'">
-              <UFormGroup label="Nom" name="name">
-                <UInput v-model="props.event.name" />
-              </UFormGroup>
-              <UFormGroup label="Date" name="date">
-                <UInput type="datetime-local" v-model="props.event.start" />
-                <UInput type="datetime-local" v-model="props.event.end" />
-              </UFormGroup>
-              <UFormGroup label="Description" name="description">
-                <UTextarea v-model="props.event.description"/>
-              </UFormGroup>
-            </div>
-            <div v-if="item.key === 'opening_hour'">
-              <UFormGroup label="Date" name="date">
-                <UInput type="datetime-local" v-model="props.event.start" />
-                <UInput type="datetime-local" v-model="props.event.end" />
-              </UFormGroup>
-            </div>
-            <template #footer>
-              <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
-              <UButton @click="validate(item.key)">Valider</UButton>
-            </template>
-          </UCard>
-          
-        </template> 
-      </UTabs>
-      </div>
-      <div v-if="props.event.mode == 'edit'">
-        <UCard>
-            <template #header>
-              <div class="flex justify-between">
-                <h3 v-if="props.event.type === 'event'">Modifier l'événement</h3>
-                <h3 v-if="props.event.type === 'opening_hour'">Modifier l'horaire d'ouverture</h3>
-
-                <UButton icon="i-heroicons-trash-20-solid" color="red" @click="emit('deleteEvent', props.event)"/>
-              </div>
-            </template>
-            <div>
-              <UFormGroup v-if="props.event.type === 'event'" label="Nom" name="name">
-                <UInput v-model="props.event.name" />
-              </UFormGroup>
-              <UFormGroup label="Date" name="date">
-                <UInput type="datetime-local" v-model="props.event.start" />
-                <UInput type="datetime-local" v-model="props.event.end" />
-              </UFormGroup>
-              <UFormGroup v-if="props.event.type === 'event'" label="Description" name="description">
-                <UTextarea v-model="props.event.description"/>
-              </UFormGroup>
-            </div>
-            
-            <template #footer>
-              <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
-              <UButton @click="validate('event')">Valider</UButton>
-            </template>
-          </UCard>
-      </div>
+        <UTabs ref="tabs" :items="eventType" :default-index="props.eventRequest.type == 'event' ? 1 : 0"> 
+          <template #item="{item}">
+            <UCard>
+              <template #header>
+                <div class="flex justify-between">
+                  <h3>{{ item.label }}</h3>
+                  <UButton v-if="props.eventRequest?.mode === 'edit'" icon="i-heroicons-trash-20-solid" color="red" @click="deleteEvent"/>                
+                </div>
+              </template>
+                <EventEditorForm v-if="item.key === 'event'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')" :loading="props.loading"/>
+                <OpeningHourEditorForm v-if="item.key === 'opening_hour'" :event-request="eventRequest"  @event-request="handleEventRequest" @cancel="emit('cancel')" :loading="props.loading"/>
       
+            </UCard>
+            
+          </template> 
+        </UTabs>
     </UCard> 
     
   </USlideover>
 </template>
 
-<script setup>
-const props = defineProps(['event'])
-const emit = defineEmits(['cancel', 'createEvent', 'editEvent', 'deleteEvent'])
+<script setup lang="ts">
+import { BasicEvent, EventEditionRequest } from '~/types/global';
 
-watch(() => props.event, (type) => {
-  console.log(type)
-})
-const validate = (eventType) => {
+const props = defineProps<{eventRequest: EventEditionRequest, loading: Boolean}>()
 
-  if (props.event.mode == 'edit') {
-    emit('editEvent', props.event)
-  } else {
-    props.event.type = eventType
-    emit('createEvent', props.event)
-  }
+const emit = defineEmits<{
+  update: [value: EventEditionRequest],
+  cancel: []
+}>()
+
+
+const handleEventRequest= (request : EventEditionRequest) => {
+  emit('update', 
+   request
+  )
 }
 
+const deleteEvent = () => {
+  emit('update', {
+    mode: 'delete',
+    type: props.eventRequest.type,
+    id: props.eventRequest.id
+  })
+}
 
-
-
-const eventType = [
+const eventType = computed(() => [
 {
   key: 'opening_hour',
-  label: "Horaires d'ouverture"
+  label: "Horaires d'ouverture",
+  disabled: props.eventRequest.mode == 'edit' && props.eventRequest.type == 'event'
 },
 {
   key: 'event',
-  label: 'Evénement'
+  label: 'Evénement',
+  disabled: props.eventRequest.mode == 'edit' && props.eventRequest.type == 'opening_hour'
 }
-]
+])
+
+
 
 </script>
