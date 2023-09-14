@@ -30,7 +30,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         .from('opening_hours')
         .update(event)
         .eq('id', event.id)
-        .select()
+        .select("*, organizer (id, username)")
         .single()
         
         if (data) {

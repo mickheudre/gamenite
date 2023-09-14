@@ -47,7 +47,6 @@
         :on-event-click="onEventClick">
 
         <template #event="{ event, view }">
-            <v-icon>{{ event.icon }}</v-icon>
             
             <div class="vuecal__event-title my-2 md:mx-2" v-html="event.title" />
             
@@ -248,7 +247,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                         newCalEventObject.event.organizer = data.organizer
                         eventsCal.value.push(newCalEventObject.event)
                     } else {
-                        eventsCal.value.push({ title: "Ouvert", start:  new Date(data.start_at), end: new Date(data.end_at), id: data.id, class: "opening_hour"})
+                        eventsCal.value.push({ title: "Ouvert", start:  new Date(data.start_at), end: new Date(data.end_at), id: data.id, class: "opening_hour", organizer: data.organizer})
                         
                     }
                 }
@@ -264,7 +263,6 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 
                 if (eventRequest.type === 'event') {
                     const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
-                     console.log(data, error)
                     if (data) {
                         const found = eventsCal.value.find(ev => ev.id === data.id)
                         if (found) {
@@ -284,6 +282,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                         if (found) {
                             found.start= new Date(data.start_at)
                             found.end = new Date(data.end_at)
+                            found.organizer = data.organizer
+
                         }
                     }
                 }
