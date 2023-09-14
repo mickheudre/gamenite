@@ -12,13 +12,15 @@
             </template>
             <div class="border rounded-md items-center flex space-x-2 p-2"><UIcon name="i-heroicons-calendar-days-20-solid"/><span> {{ formatDate(event.start_at) }}</span></div>
             
-            <span>{{ event?.description }}</span>
+            <div class="list-disc" v-html="markdown" />
             
         </UCard>
     </UModal>
 </template>
 
 <script setup lang="ts">
+import { marked } from 'marked';
+
 const props= defineProps(["event"])
 
 const formatDate = (date: string) => {
@@ -30,6 +32,12 @@ const formatDateShort = (date: string) => {
     return eventStart.toLocaleString('fr-FR', { month: "numeric", day: "numeric"}) 
 }
 
+const markdown = computed(() => {
+    if (!props.event.description) {
+        return null
+    }
+    return marked.parse(props.event.description)
+})
 const formatTime = (startDate: string, endDate: string) => {
     const eventStart = new Date(startDate)
     const eventEnd = new Date(endDate)
@@ -38,3 +46,20 @@ const formatTime = (startDate: string, endDate: string) => {
 }
 
 </script>
+
+<style>
+ul { 
+    @apply list-disc;
+}
+li {
+    @apply ml-4
+}
+
+p {
+    @apply my-2
+}
+
+a {
+    @apply font-semibold;
+}
+</style>
