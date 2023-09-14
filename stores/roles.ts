@@ -7,7 +7,7 @@ export const useRolesStore = defineStore('rolesStore', () => {
     
 
     const {pending, data: roles, error, refresh} =  useLazyAsyncData('userRoles', async () => {
-        const {data, error} = await supabase.from("roles").select("org (id, name) , roles").eq("user_id", user.value.id)
+        const {data, error} = await supabase.from("roles").select("org (id, name) , roles").eq("user", user.value.id)
         return data
     })
     

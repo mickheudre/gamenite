@@ -4,9 +4,15 @@ export interface Credentials {
   }
 
 export  interface UserProfile {
+  id: string,
   username: string,
   firstname: string,
   lastname: string
+}
+
+export interface BasicUser {
+  id: string,
+  username: string
 }
 
 export interface BasicEvent {
@@ -20,7 +26,8 @@ export interface BasicEvent {
 export interface BasicOpeningHour{
   date: Date,
   start: string,
-  end: string
+  end: string,
+  organizer: BasicUser
 }
 
 export interface EventEditionRequest {

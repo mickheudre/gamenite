@@ -72,7 +72,7 @@ const eventsCal = ref([])
 
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event"}))
-openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
+openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour", background: true}))
 
 
 const awaitingForResponse = ref(false)
@@ -221,7 +221,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 }
                 if (eventRequest.type === 'opening_hour') {
                     
-                    const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate})
+                    const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate, organizer: eventRequest.event.organizer.id})
                     if (data && newCalEventObject.event) {
                         newCalEventObject.event.title = "Ouvert"
                         newCalEventObject.event.class = "opening_hour"
@@ -259,7 +259,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 }
                 
                 if (eventRequest.type === 'opening_hour') {
-                    const {data, error} = await openingHoursStore.updateOpeningHour({id: eventRequest.id, start_at: startDate, end_at: endDate})
+                    const {data, error} = await openingHoursStore.updateOpeningHour({id: eventRequest.id, start_at: startDate, end_at: endDate, organizer: eventRequest.event.organizer.id})
                     
                     if (data) {
                         const found = eventsCal.value.find(ev => ev.id === data.id)
@@ -312,6 +312,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 date: new Date(event.start),
                 start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
                 end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                organizer: event.organizer
             }
         }
         
