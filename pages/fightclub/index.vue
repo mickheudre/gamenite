@@ -212,6 +212,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                         newCalEventObject.event.title = data.name
                         newCalEventObject.event.class = "event"
                         newCalEventObject.event.id = data.id
+                        newCalEventObject.event.start = new Date(data.start_at)
+                        newCalEventObject.event.end = new Date(data.end_at)
                         eventsCal.value.push(newCalEventObject.event)
                     } else {
                         eventsCal.value.push({ title: data.name, start: new Date(data.start_at), end: new Date(data.end_at),id: data.id, class: "event"})
@@ -224,6 +226,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                         newCalEventObject.event.title = "Ouvert"
                         newCalEventObject.event.class = "opening_hour"
                         newCalEventObject.event.id = data.id
+                        newCalEventObject.event.start = new Date(data.start_at)
+                        newCalEventObject.event.end = new Date(data.end_at)
                         eventsCal.value.push(newCalEventObject.event)
                     } else {
                         eventsCal.value.push({ title: "Ouvert", start:  new Date(data.start_at), end: new Date(data.end_at), id: data.id, class: "opening_hour"})
