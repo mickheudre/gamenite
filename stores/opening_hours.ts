@@ -7,7 +7,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
     
     
     const {pending, data: openingHours, error, refresh} =  useLazyAsyncData('opening_hours', async () => {
-        const {data, error} = await supabase.from("opening_hours").select("*")
+        const {data, error} = await supabase.from("opening_hours").select("*, organizer (id, username)")
         const events = ref([])
         return data
     })
@@ -15,8 +15,8 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
     const addOpeningHour = async (openingHour) => {
         const { data, error } = await supabase
         .from('opening_hours')
-        .insert({...openingHour, org: 1, key_holder: user.value.id})
-        .select()
+        .insert({...openingHour, org: 1})
+        .select("*, organizer (id, username)")
         .single()
         
         if (data) {
@@ -30,7 +30,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         .from('opening_hours')
         .update(event)
         .eq('id', event.id)
-        .select()
+        .select("*, organizer (id, username)")
         .single()
         
         if (data) {

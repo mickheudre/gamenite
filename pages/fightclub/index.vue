@@ -45,6 +45,22 @@
         @event-create="onEventCreateStart"
         @event-drag-create="onEventCreate"
         :on-event-click="onEventClick">
+
+        <template #event="{ event, view }">
+            
+            <div class="vuecal__event-title my-2 md:mx-2" v-html="event.title" />
+            
+            <small class="vuecal__event-time">
+                <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
+            </small>
+
+            <div v-if="event.organizer">
+                <UTooltip :text="event.organizer.username" >
+                    <UAvatar :alt="event.organizer.username" size="sm" />
+                </UTooltip>
+            </div>
+        </template>
+
     </vue-cal>
     
 </UCard>
@@ -72,7 +88,7 @@ const eventsCal = ref([])
 
 
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event"}))
-openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at),id: event.id, class: "opening_hour", background: true}))
+openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour", background: true}))
 
 
 const awaitingForResponse = ref(false)
@@ -221,16 +237,17 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 }
                 if (eventRequest.type === 'opening_hour') {
                     
-                    const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate})
+                    const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate, organizer: eventRequest.event.organizer.id})
                     if (data && newCalEventObject.event) {
                         newCalEventObject.event.title = "Ouvert"
                         newCalEventObject.event.class = "opening_hour"
                         newCalEventObject.event.id = data.id
                         newCalEventObject.event.start = new Date(data.start_at)
                         newCalEventObject.event.end = new Date(data.end_at)
+                        newCalEventObject.event.organizer = data.organizer
                         eventsCal.value.push(newCalEventObject.event)
                     } else {
-                        eventsCal.value.push({ title: "Ouvert", start:  new Date(data.start_at), end: new Date(data.end_at), id: data.id, class: "opening_hour"})
+                        eventsCal.value.push({ title: "Ouvert", start:  new Date(data.start_at), end: new Date(data.end_at), id: data.id, class: "opening_hour", organizer: data.organizer})
                         
                     }
                 }
@@ -246,7 +263,6 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 
                 if (eventRequest.type === 'event') {
                     const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
-                     console.log(data, error)
                     if (data) {
                         const found = eventsCal.value.find(ev => ev.id === data.id)
                         if (found) {
@@ -259,13 +275,15 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 }
                 
                 if (eventRequest.type === 'opening_hour') {
-                    const {data, error} = await openingHoursStore.updateOpeningHour({id: eventRequest.id, start_at: startDate, end_at: endDate})
+                    const {data, error} = await openingHoursStore.updateOpeningHour({id: eventRequest.id, start_at: startDate, end_at: endDate, organizer: eventRequest.event.organizer.id})
                     
                     if (data) {
                         const found = eventsCal.value.find(ev => ev.id === data.id)
                         if (found) {
                             found.start= new Date(data.start_at)
                             found.end = new Date(data.end_at)
+                            found.organizer = data.organizer
+
                         }
                     }
                 }
@@ -312,6 +330,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 date: new Date(event.start),
                 start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
                 end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                organizer: event.organizer
             }
         }
         

@@ -18,7 +18,7 @@ export const useUserStore = defineStore('userStore', () => {
         .eq('id', user.value.id)
         .single()      
         
-        const {data : dataRoles, error: errorRoles}  = await supabase.from("roles").select("org (id, name) , roles").eq("user_id", user.value.id)
+        const {data : dataRoles, error: errorRoles}  = await supabase.from("roles").select("org (id, name) , roles").eq("user", user.value.id)
 
         if (dataRoles?.find(role => (role.org.id == 1) && role.roles.find(role => role === 'admin') )) {
                 permissions.value.fightClub.push('eventCreate', 'eventEdit', 'eventDelete')
