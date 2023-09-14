@@ -45,6 +45,23 @@
         @event-create="onEventCreateStart"
         @event-drag-create="onEventCreate"
         :on-event-click="onEventClick">
+
+        <template #event="{ event, view }">
+            <v-icon>{{ event.icon }}</v-icon>
+            
+            <div class="vuecal__event-title my-2 md:mx-2" v-html="event.title" />
+            
+            <small class="vuecal__event-time">
+                <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
+            </small>
+
+            <div v-if="event.organizer">
+                <UTooltip :text="event.organizer.username" >
+                    <UAvatar :alt="event.organizer.username" size="sm" />
+                </UTooltip>
+            </div>
+        </template>
+
     </vue-cal>
     
 </UCard>
