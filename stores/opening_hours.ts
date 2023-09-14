@@ -16,7 +16,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         const { data, error } = await supabase
         .from('opening_hours')
         .insert({...openingHour, org: 1})
-        .select()
+        .select("*, organizer (id, username)")
         .single()
         
         if (data) {
