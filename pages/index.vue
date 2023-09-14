@@ -2,7 +2,13 @@
   <!-- <Content title="Home" /> -->
   <UContainer>
     <h1> Salut {{ userStore.profile ? userStore.profile.username : ''}} </h1>
-    <UCard >
+    <UCard class="my-4">
+      <template #header>
+        <h4>Mes horaires d'ouverture</h4>
+      </template>
+      <OpeningHoursList />
+    </UCard>
+    <UCard class="my-4">
       <template #header>
         <h4>Mes Roles</h4>
       </template>

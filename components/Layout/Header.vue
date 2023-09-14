@@ -1,6 +1,6 @@
 <template>
     <div class="relative sticky top-0 w-full flex justify-between p-4">
-        <span>Gamenite</span>
+        <NuxtLink to="/">Gamenite</NuxtLink>
         <UButton v-if="!user"><NuxtLink to="/login">Se connecter</NuxtLink></UButton>
         <UDropdown v-else :items="items" :popper="{ placement: 'bottom-start' }">
             <UAvatar :alt="userStore.profile?.username" size="lg" />
