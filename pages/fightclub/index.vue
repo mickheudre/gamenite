@@ -13,9 +13,9 @@
             <UModal v-model="showDetailsModal">
                 <UCard>
                     <template #header>
-                        <div class="flex justify-between">
+                        <div class="flex justify-between items-center">
                             <h4>{{currentEvent?.name  }}</h4>
-                            <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDate(currentEvent.start_at)" />
+                            <div class="border rounded-md items-center flex space-x-2 p-2"><UIcon name="i-heroicons-calendar-days-20-solid"/><span> {{ formatDate(currentEvent.start_at) }}</span></div>
                         </div>
                     </template>
                     <span>{{ currentEvent?.description }}</span>
