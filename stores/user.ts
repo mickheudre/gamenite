@@ -21,9 +21,11 @@ export const useUserStore = defineStore('userStore', () => {
         const {data : dataRoles, error: errorRoles}  = await supabase.from("roles").select("org (id, name) , roles").eq("user", user.value.id)
 
         if (dataRoles?.find(role => (role.org.id == 1) && role.roles.find(role => role === 'admin') )) {
-                permissions.value.fightClub.push('eventCreate', 'eventEdit', 'eventDelete')
+                permissions.value.fightClub.push('eventCreate', 'eventEdit', 'eventDelete', 'openingHoursCreate', 'openingHoursEdit', 'openingHoursDelete')
             }
-        
+            if (dataRoles?.find(role => (role.org.id == 1) && role.roles.find(role => role === 'keys') )) {
+                permissions.value.fightClub.push('openingHoursCreate', 'openingHoursEdit', 'openingHoursDelete')
+            }
 
         return {...dataUser, roles: dataRoles, permissions}
     })

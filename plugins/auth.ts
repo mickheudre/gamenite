@@ -28,7 +28,7 @@ export default defineNuxtPlugin({
       }
       if (event == 'SIGNED_IN') {
         
-        navigateTo("/fightclub")
+        navigateTo("/")
       }
       
     })

@@ -346,7 +346,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     }
     
     const userCanManageEvent = computed(() => {
-        return userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate')
+        return userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate' || p == 'openingHoursCreate')
     })
 </script>
 

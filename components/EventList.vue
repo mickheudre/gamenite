@@ -57,7 +57,7 @@ const items = (row) => [
     click: () => emit('editEvent', row)
 }], 
 [{
-    label: "Supprimer",
+    label: "Annuler",
     icon: 'i-heroicons-trash-20-solid',
     click: () => emit('deleteEvent', row)
 }]
