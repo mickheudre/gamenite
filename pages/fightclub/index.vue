@@ -16,7 +16,7 @@
             <EventDetailsModal v-model="showDetailsModal" :event="currentEvent" @deleteEvent="deleteEvent" @edit-event="editEvent">
             </EventDetailsModal>
         </UCard>
-        <UCard class="my-8">
+        <UCard class="my-8" :ui="{ body: { padding: 'p-2 sm:p-4' } }">
             <vue-cal v-if="!loading && !userCanManageEvent"
             locale="fr"
             :events="eventsCal"
@@ -24,6 +24,11 @@
             :time-from="9 * 60"
             :time-to="24 * 60"
             :disable-views="['years', 'year', 'month', 'day']">
+            
+            <template  #title="{ title, view }">
+                <span class="capitalize"> {{ calendarTitle  }}</span>
+            </template>
+            
             
             <template #event="{ event, view }">
                 
@@ -61,6 +66,9 @@
         @event-drag-create="onEventCreate"
         :on-event-click="onEventClick">
         
+        <template  #title="{ title, view }">
+                <span class="capitalize"> {{ calendarTitle  }}</span>
+            </template>
         
         <template #event="{ event, view }">
             
@@ -114,6 +122,9 @@ openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", sta
 
 const awaitingForResponse = ref(false)
 
+const calendarTitle = computed(() => {
+    return new Date().toLocaleDateString("fr", { month: "long", year: "numeric"})
+})
 
 const allowDragAndDrop = computed(() => {
     return window.innerWidth > 640
@@ -148,9 +159,9 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         }
     })
     
-
+    
     const onEventCreateClick = (event) => {
-
+        
         const start = new Date(event)
         start.setMinutes(0)
         const end = new Date(start)
@@ -169,9 +180,9 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         
         isOpen.value = true
     }
-
+    
     const onEventCreateStart = (event, deleteEvent) => {
-
+        
         if (newCalEventObject.event == null) {
             newCalEventObject.event = event
         }
@@ -182,7 +193,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         return event
     }
     
-
+    
     
     const onEventCreate = (event) => {
         
@@ -427,6 +438,10 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
 .vuecal__no-event {
     @apply hidden
 }
+
+/* .vuecal__title-bar {
+    @apply hidden;
+} */
 
 @media (max-width: 640px) {
     .vuecal__time-cell-label {
