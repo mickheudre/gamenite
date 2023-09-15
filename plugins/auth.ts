@@ -14,6 +14,7 @@ export default defineNuxtPlugin({
     const openingHoursStore = useOpeningHoursStore()
 
     supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
+      const route = useRoute()
       rolesStore.refresh()
       userStore.refresh()
       eventsStore.refresh()
@@ -26,7 +27,9 @@ export default defineNuxtPlugin({
         return 
       }
       if (event == 'SIGNED_IN') {
-        navigateTo("/")
+        if (route.fullPath === '/login') {
+          navigateTo("/")
+        }
       }
       
     })
