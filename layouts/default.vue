@@ -8,7 +8,7 @@
   <div class="w-screen min-h-screen bg-white dark:bg-gray-800">
     <NuxtLoadingIndicator />
     <LayoutHeader />
-    <div class="py-4">
+    <div class="py-16">
     <slot />
 
     </div>

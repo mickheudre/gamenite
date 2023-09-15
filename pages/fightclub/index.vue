@@ -21,6 +21,26 @@
             :time-from="9 * 60"
             :time-to="24 * 60"
             :disable-views="['years', 'year', 'month', 'day']">
+
+        <template #event="{ event, view }">
+            
+            <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
+                <span>{{ event.title }}</span>
+                
+            </div>
+            
+            <small class="vuecal__event-time text-white">
+                <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
+            </small>
+
+            <div class="flex flex-col justify-end items-center h-auto">
+                <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
+                    <UAvatar :alt="event.organizer.username" size="sm" />
+                </UTooltip>
+                <!-- <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton> -->
+            </div>
+
+        </template>
         </vue-cal>
         <vue-cal v-if="!loading && userCanManageEvent"
         locale="fr"
@@ -43,7 +63,7 @@
                 
             </div>
             
-            <small class="vuecal__event-time">
+            <small class="vuecal__event-time text-white">
                 <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
             </small>
 
@@ -51,7 +71,7 @@
                 <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
                     <UAvatar :alt="event.organizer.username" size="sm" />
                 </UTooltip>
-                <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton>
+                <!-- <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton> -->
             </div>
 
         </template>
@@ -350,17 +370,12 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
 <style>
 
 .event {
-    color: #fcf0ff;
     background: rgb(238,174,202);
-    background: radial-gradient(circle, #f1f7e3 0%, #9c80db 100%);  
-    @apply rounded-lg;
+    background: radial-gradient(circle, #748cab 0%, #1d2d44 100%);  
+    @apply rounded-md text-white;
 }
 .opening_hour { 
-    color: #fcf0ff;
-    background: rgb(50,75,69);
-    background: linear-gradient(0deg, #0C5445 0%, #4f772d 50%,#31572c 100%);
-    @apply rounded-md;
-
+    @apply rounded-md text-white bg-teal-700;
 }
 
 

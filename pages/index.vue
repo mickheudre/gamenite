@@ -5,8 +5,10 @@
     
     <UCard class="md:w-1/2" :ui="{background: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'}" @click="navigateTo('/fightClub')">
       <div class="flex justify-between items-center">
-        <NuxtLink to="/fightClub" class="font-bold">Fight Club</NuxtLink>
-        <UBadge v-if="openingHoursStore.isCurrentlyOpen" label="Ouvert"/>
+        <NuxtLink to="/fightClub" class="font-bold flex items-center">Fight Club        
+        <UBadge v-if="openingHoursStore.isCurrentlyOpen" class="mx-4" color="green" label="Ouvert"/>
+</NuxtLink>
+        <UButton variant="outline" color="white" icon="i-heroicons-chevron-right"/>
       </div>
         
     </UCard>
@@ -21,7 +23,7 @@
 
 <script setup lang="ts">
 import { useUserStore } from '~/stores/user';
-import { useOpeningHoursStore } from '~/stores/permissions';
+import { useOpeningHoursStore } from '~/stores/opening_hours';
 const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
 
