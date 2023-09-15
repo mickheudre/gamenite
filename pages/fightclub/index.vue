@@ -5,7 +5,10 @@
                 <h4 class="capitalize">événements</h4>
             </template>
             <template #footer>
-                <UButton v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate') ?? false" icon="i-heroicons-plus" @click="createEvent">Proposer un événement</UButton>
+                <div class="flex justify-end">
+                    <UButton v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate') ?? false" icon="i-heroicons-plus" @click="createEvent">Ajouter un événement</UButton>
+                    
+                </div>
             </template>
             <EventList @showDetails="showDetails" @edit-event="editEvent" @delete-event="deleteEvent"/>
             
@@ -21,26 +24,26 @@
             :time-from="9 * 60"
             :time-to="24 * 60"
             :disable-views="['years', 'year', 'month', 'day']">
-
-        <template #event="{ event, view }">
             
-            <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
-                <span>{{ event.title }}</span>
+            <template #event="{ event, view }">
                 
-            </div>
-            
-            <small class="vuecal__event-time text-white">
-                <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
-            </small>
-
-            <div class="flex flex-col justify-end items-center h-auto">
-                <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
-                    <UAvatar :alt="event.organizer.username" size="sm" />
-                </UTooltip>
-                <!-- <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton> -->
-            </div>
-
-        </template>
+                <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
+                    <span>{{ event.title }}</span>
+                    
+                </div>
+                
+                <small class="vuecal__event-time text-white">
+                    <div class="flex flex-col md:flex-row justify-center items-center"><span>{{ event.start.formatTime() }}</span><span>→</span><span>{{ event.end.formatTime() }}</span></div>
+                </small>
+                
+                <div class="flex flex-col justify-end items-center h-auto">
+                    <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
+                        <UAvatar :alt="event.organizer.username" size="sm" />
+                    </UTooltip>
+                    <!-- <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton> -->
+                </div>
+                
+            </template>
         </vue-cal>
         <vue-cal v-if="!loading && userCanManageEvent"
         locale="fr"
@@ -51,11 +54,14 @@
         :snap-to-time="15"
         :disable-views="['years', 'year', 'month', 'day']"
         :editable-events="{ title: false, drag: false, resize: false, delete: false, create: true }"
-        :drag-to-create-threshold="0"
+        :drag-to-create-threshold="15"
+        :drag-to-create-event="allowDragAndDrop"
+        @cell-dblclick="onEventCreateClick"
         @event-create="onEventCreateStart"
         @event-drag-create="onEventCreate"
         :on-event-click="onEventClick">
-
+        
+        
         <template #event="{ event, view }">
             
             <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
@@ -64,18 +70,18 @@
             </div>
             
             <small class="vuecal__event-time text-white">
-                <span>{{ `${event.start.formatTime()}→${event.end.formatTime()}` }}</span>
+                <div class="flex flex-col md:flex-row justify-center items-center"><span>{{ event.start.formatTime() }}</span><span>→</span><span>{{ event.end.formatTime() }}</span></div>
             </small>
-
+            
             <div class="flex flex-col justify-end items-center h-auto">
                 <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
                     <UAvatar :alt="event.organizer.username" size="sm" />
                 </UTooltip>
                 <!-- <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton> -->
             </div>
-
+            
         </template>
-
+        
     </vue-cal>
     
 </UCard>
@@ -109,6 +115,10 @@ openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", sta
 const awaitingForResponse = ref(false)
 
 
+const allowDragAndDrop = computed(() => {
+    return window.innerWidth > 640
+})
+
 const currentEvent = ref(null)
 const showDetailsModal = ref(false)
 
@@ -138,7 +148,30 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         }
     })
     
+
+    const onEventCreateClick = (event) => {
+
+        const start = new Date(event)
+        start.setMinutes(0)
+        const end = new Date(start)
+        end.setHours(start.getHours() + 4)
+        eventRequest.value = {
+            mode: 'create',
+            type: 'opening_hour',
+            event: {
+                name: "Nouvel Evénement",
+                date: new Date(start),
+                start: new Date(start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+            }
+        }
+        
+        
+        isOpen.value = true
+    }
+
     const onEventCreateStart = (event, deleteEvent) => {
+
         if (newCalEventObject.event == null) {
             newCalEventObject.event = event
         }
@@ -148,6 +181,9 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         }
         return event
     }
+    
+
+    
     const onEventCreate = (event) => {
         
         eventRequest.value = {
@@ -212,7 +248,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         if (index != -1) {
             eventsCal.value.splice(index, 1)
         }
-
+        
         showDetailsModal.value = false
     }
     
@@ -301,7 +337,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                             found.start= new Date(data.start_at)
                             found.end = new Date(data.end_at)
                             found.organizer = data.organizer
-
+                            
                         }
                     }
                 }
@@ -380,6 +416,17 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     @apply rounded-md text-white bg-teal-700;
 }
 
+.vuecal__cell--selected {
+    @apply bg-transparent;
+}
+
+.vuecal__cell--today {
+    @apply bg-transparent;
+}
+
+.vuecal__no-event {
+    @apply hidden
+}
 
 @media (max-width: 640px) {
     .vuecal__time-cell-label {
