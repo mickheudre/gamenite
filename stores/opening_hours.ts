@@ -8,13 +8,25 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
     
     const {pending, data: openingHours, error, refresh} =  useLazyAsyncData('opening_hours', async () => {
         const now = new Date()
+        var day = now.getDay() || 7;
+        if( day !== 1 )
+            now.setHours(-24 * (day - 1));
+
         const {data, error} = await supabase.from("opening_hours").select("*, org(id, name), organizer (id, username)").gte("start_at", now.toISOString())
         const events = ref([])
         return data
     })
 
     const userOpeningHours = computed(() => {
-        return openingHours.value?.filter(oh => oh.organizer.id === user.value.id)
+        const now = new Date()
+        now.setHours(0)
+        return openingHours.value?.filter(oh => oh.organizer.id === user.value.id && oh.start_at > now.toISOString())
+    })
+
+    const isCurrentlyOpen = computed(() => {
+        const now = new Date()
+        return openingHours.value?.find(oh => oh.start_at < now.toISOString() && oh.end_at > now.toISOString())
+
     })
     
     const addOpeningHour = async (openingHour) => {
@@ -66,9 +78,8 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
             }
         }
         return  {data, error}
-        
-        
+
     }
     
-    return { openingHours, userOpeningHours, pending, refresh, addOpeningHour, updateOpeningHour, deleteOpeningHour }
+    return { openingHours, userOpeningHours, isCurrentlyOpen, pending, refresh, addOpeningHour, updateOpeningHour, deleteOpeningHour }
 })

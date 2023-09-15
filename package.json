@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "marked": "^9.0.0",
     "pinia": "^2.1.6",
     "v-calendar": "^2.4.1",
     "vue-cal": "^4.8.1"

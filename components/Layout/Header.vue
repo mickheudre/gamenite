@@ -1,10 +1,13 @@
 <template>
-    <div class="relative sticky top-0 w-full flex justify-between p-4">
-        <NuxtLink to="/">Gamenite</NuxtLink>
-        <UButton v-if="!user"><NuxtLink to="/login">Se connecter</NuxtLink></UButton>
-        <UDropdown v-else :items="items" :popper="{ placement: 'bottom-start' }">
-            <UAvatar :alt="userStore.profile?.username" size="lg" />
-        </UDropdown>
+    <div class="relative sticky top-0 w-full flex justify-between items-center px-4 md:px-8 pt-4 pb-3 dark:bg-gray-900">
+        <NuxtLink to="/">Tabletop Social Club</NuxtLink>
+        <div class="flex items-centrer space-x-2 md:space-x-4">
+            <ColorModeSelector />
+            <UButton v-if="!user"><NuxtLink to="/login">Se connecter</NuxtLink></UButton>
+            <UDropdown v-else :items="items" :popper="{ placement: 'bottom-start' }">
+                <UAvatar :alt="userStore.profile?.username" size="md" />
+            </UDropdown>
+        </div>
         
     </div>
 </template>
@@ -29,7 +32,7 @@ const items = [
     label: 'Se déconnecter',
     icon: 'i-heroicons-pencil-square-20-solid',
     click: () => {
-       auth.signOut()
+        auth.signOut()
     }
 }
 ]]

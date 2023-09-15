@@ -1,13 +1,14 @@
 <template>
     <UTable :loading="eventsStore.pending" :rows="eventsStore.incomingEvents" :columns="userStore.profile?.permissions['fightClub'].find(p => p == 'eventDelete') ? columnsAdmin : columnsGuest" :sort="{ column: 'start_at',  direction: 'asc' }">
         <template #name-data="{row}">
-            <UButton @click="$emit('showDetails', row)" variant="link">{{row.name}}</UButton>
+            <div class="w-48 md:w-full truncate" @click="$emit('showDetails', row)">{{row.name}}</div>
         </template>
         <template #start_at-data="{row}">
-            <span>{{ formatDate(row.start_at) }}</span>
+            <span class="hidden md:flex capitalize">{{ formatDateLong(row.start_at) }}</span>
+            <span class="flex md:hidden">{{  formatDateShort(row.start_at) }}</span>
         </template>
         <template #actions-data="{ row }" >
-            <UDropdown :items="items(row)">
+            <UDropdown class="hidden sm:flex" :items="items(row)">
                 <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
             </UDropdown>
         </template>
@@ -15,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { createElementBlock } from 'nuxt/dist/app/compat/capi';
 import { useEventsStore } from '~/stores/events';
 
 const eventsStore = useEventsStore()
@@ -59,9 +59,18 @@ const items = (row) => [
 [{
     label: "Annuler",
     icon: 'i-heroicons-trash-20-solid',
-    click: () => emit('deleteEvent', row)
+    click: () => emit('deleteEvent', row.id)
 }]
 ]
+
+const formatDateLong = (date: string) => {
+    const eventStart = new Date(date)
+    return eventStart.toLocaleString('fr-FR', { weekday: "long", month: "long", day: "numeric"}) 
+}
+const formatDateShort = (date: string) => {
+    const eventStart = new Date(date)
+    return eventStart.toLocaleString('fr-FR', { month: "numeric", day: "numeric"}) 
+}
 
 const formatDate = (date: string) => {
     const eventStart = new Date(date)
