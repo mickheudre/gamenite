@@ -26,7 +26,7 @@ export default defineNuxtPlugin({
         return 
       }
       if (event == 'SIGNED_IN') {
-        // navigateTo("/")
+        navigateTo("/")
       }
       
     })
