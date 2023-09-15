@@ -1,5 +1,5 @@
 <template>
-    <div class="relative sticky top-0 w-full flex justify-between items-center px-4 md:px-8 pt-4 pb-3 dark:bg-gray-900">
+    <div class="relative sticky top-0 w-full flex justify-between items-center px-4 md:px-8 pt-4 pb-3 dark:bg-gray-900 z-50">
         <NuxtLink to="/">Tabletop Social Club</NuxtLink>
         <div class="flex items-centrer space-x-2 md:space-x-4">
             <ColorModeSelector />

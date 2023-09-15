@@ -54,7 +54,9 @@
         :snap-to-time="15"
         :disable-views="['years', 'year', 'month', 'day']"
         :editable-events="{ title: false, drag: false, resize: false, delete: false, create: true }"
-        :drag-to-create-threshold="50"
+        :drag-to-create-threshold="15"
+        :drag-to-create-event="allowDragAndDrop"
+        @cell-dblclick="onEventCreateClick"
         @event-create="onEventCreateStart"
         @event-drag-create="onEventCreate"
         :on-event-click="onEventClick">
@@ -113,6 +115,10 @@ openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", sta
 const awaitingForResponse = ref(false)
 
 
+const allowDragAndDrop = computed(() => {
+    return window.innerWidth > 640
+})
+
 const currentEvent = ref(null)
 const showDetailsModal = ref(false)
 
@@ -143,6 +149,26 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     })
     
 
+    const onEventCreateClick = (event) => {
+
+        const start = new Date(event)
+        start.setMinutes(0)
+        const end = new Date(start)
+        end.setHours(start.getHours() + 4)
+        eventRequest.value = {
+            mode: 'create',
+            type: 'opening_hour',
+            event: {
+                name: "Nouvel Evénement",
+                date: new Date(start),
+                start: new Date(start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+            }
+        }
+        
+        
+        isOpen.value = true
+    }
 
     const onEventCreateStart = (event, deleteEvent) => {
 
