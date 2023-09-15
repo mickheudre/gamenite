@@ -59,7 +59,7 @@ const items = (row) => [
 [{
     label: "Annuler",
     icon: 'i-heroicons-trash-20-solid',
-    click: () => emit('deleteEvent', row)
+    click: () => emit('deleteEvent', row.id)
 }]
 ]
 

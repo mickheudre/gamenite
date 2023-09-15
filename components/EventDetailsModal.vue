@@ -5,12 +5,12 @@
                 <div class="flex justify-between items-center">
                     <h4 class="font-bold">{{event?.name  }}</h4>
                     <div class="space-x-4">
-                        <UButton icon="i-heroicons-pencil-square" variant="solid" />
-                        <UButton icon="i-heroicons-trash" color="red" />
+                        <UButton icon="i-heroicons-pencil-square" variant="solid" @click="$emit('editEvent', event)" />
+                        <UButton icon="i-heroicons-trash" color="red" @click="$emit('deleteEvent', event.id)"/>
                     </div>
                 </div>
             </template>
-            <div class="border rounded-md items-center flex space-x-2 p-2"><UIcon name="i-heroicons-calendar-days-20-solid"/><span> {{ formatDate(event.start_at) }}</span></div>
+            <div class="border rounded-md items-center flex space-x-2 p-2"><UIcon name="i-heroicons-calendar-days-20-solid"/><span class="capitalize"> {{ `${formatDate(event.start_at)} ${formatTime(event.start_at, event.end_at)}`  }}</span></div>
             
             <div class="list-disc" v-html="markdown" />
             
@@ -22,6 +22,7 @@
 import { marked } from 'marked';
 
 const props= defineProps(["event"])
+
 
 const formatDate = (date: string) => {
     const eventStart = new Date(date)
@@ -44,6 +45,7 @@ const formatTime = (startDate: string, endDate: string) => {
     
     return `${eventStart.toLocaleTimeString("fr-FR", { hour: 'numeric', minute: 'numeric'})}→${eventEnd.toLocaleTimeString("fr-FR", { hour: 'numeric', minute: 'numeric'})}`
 }
+
 
 </script>
 

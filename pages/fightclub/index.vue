@@ -10,7 +10,7 @@
             <EventList @showDetails="showDetails" @edit-event="editEvent" @delete-event="deleteEvent"/>
             
             
-            <EventDetailsModal v-model="showDetailsModal" :event="currentEvent">
+            <EventDetailsModal v-model="showDetailsModal" :event="currentEvent" @deleteEvent="deleteEvent" @edit-event="editEvent">
             </EventDetailsModal>
         </UCard>
         <UCard class="my-8">
@@ -192,7 +192,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 description: event.description
             }
         }
-        
+        showDetailsModal.value = false
         isOpen.value = true
     }
     
@@ -212,6 +212,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         if (index != -1) {
             eventsCal.value.splice(index, 1)
         }
+
+        showDetailsModal.value = false
     }
     
     const deleteOpeningHour = async (eventId) => {
