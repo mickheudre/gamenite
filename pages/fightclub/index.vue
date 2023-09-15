@@ -54,7 +54,7 @@
         :snap-to-time="15"
         :disable-views="['years', 'year', 'month', 'day']"
         :editable-events="{ title: false, drag: false, resize: false, delete: false, create: true }"
-        :drag-to-create-threshold="15"
+        :drag-to-create-threshold="50"
         @event-create="onEventCreateStart"
         @event-drag-create="onEventCreate"
         :on-event-click="onEventClick">
