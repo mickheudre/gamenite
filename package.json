@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "tabletop-social-club",
   "private": true,
   "scripts": {
     "build": "nuxt build",
