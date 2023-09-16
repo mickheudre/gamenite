@@ -26,7 +26,7 @@
             :disable-views="['years', 'year', 'month', 'day']">
             
             <template  #title="{ title, view }">
-                <span class="capitalize"> {{ calendarTitle  }}</span>
+                <span class="capitalize"> {{ calendarTitle(view.startDate)  }}</span>
             </template>
             
             
@@ -67,7 +67,7 @@
         :on-event-click="onEventClick">
         
         <template  #title="{ title, view }">
-                <span class="capitalize"> {{ calendarTitle  }}</span>
+                <span class="capitalize"> {{ calendarTitle(view.startDate)  }}</span>
             </template>
         
         <template #event="{ event, view }">
@@ -122,9 +122,9 @@ openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", sta
 
 const awaitingForResponse = ref(false)
 
-const calendarTitle = computed(() => {
-    return new Date().toLocaleDateString("fr", { month: "long", year: "numeric"})
-})
+const calendarTitle = (date : string) => {
+    return new Date(date).toLocaleDateString("fr", { month: "long", year: "numeric"})
+}
 
 const allowDragAndDrop = computed(() => {
     return window.innerWidth > 640
