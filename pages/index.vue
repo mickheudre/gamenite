@@ -1,14 +1,14 @@
 <template>
   <!-- <Content title="Home" /> -->
   <UContainer class="space-y-8">
-    <h1 class="text-xl"> Salut {{ userStore.profile ? userStore.profile.username : ''}} ✌️</h1>
+    <h1 class="text-2xl font-semibold"> Salut {{ userStore.profile ? userStore.profile.username : ''}} ✌️</h1>
     
     <UCard class="md:w-1/2" :ui="{background: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'}" @click="navigateTo('/fightClub')">
       <div class="flex justify-between items-center">
-        <NuxtLink to="/fightClub" class="font-bold flex items-center">Fight Club        
+        <NuxtLink to="/fightClub" class="font-bold flex items-center text-white">Fight Club        
         <UBadge v-if="openingHoursStore.isCurrentlyOpen" class="mx-4" color="green" label="Ouvert"/>
 </NuxtLink>
-        <UButton variant="outline" color="white" icon="i-heroicons-chevron-right"/>
+        <UIcon name="i-heroicons-chevron-right" class="text-xl text-white"/>
       </div>
         
     </UCard>

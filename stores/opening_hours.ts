@@ -20,6 +20,9 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
     const userOpeningHours = computed(() => {
         const now = new Date()
         now.setHours(0)
+        if (!user.value) {
+            return []
+        }
         return openingHours.value?.filter(oh => oh.organizer.id === user.value.id && oh.start_at > now.toISOString())
     })
 
