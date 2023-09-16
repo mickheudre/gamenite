@@ -13,7 +13,7 @@ export const useEventsStore = defineStore('eventsStore', () => {
     })
 
     const incomingEvents = computed(() => {
-        return events.value?.filter(event => new Date(event.start_at) > new Date())
+        return events.value?.filter(event =>  new Date() < new Date(event.end_at))
     })
     
     const addEvent = async (event) => {
