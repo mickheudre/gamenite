@@ -30,12 +30,21 @@ export const useUserStore = defineStore('userStore', () => {
         return {...dataUser, roles: dataRoles, permissions}
     })
     
-    async function updateProfile(profile) {
-        const { error } = await supabase
+    async function updateProfile(newProfile) {
+        const { data, error } = await supabase
         .from('users')
-        .update({ username: profile.username, first_name : profile.firstName, last_name: profile.lastName })
+        .update({ username: newProfile.username, first_name : newProfile.firstName, last_name: newProfile.lastName })
         .eq('id', user.value.id)
-        refresh()
+        .select()
+        .single()
+        
+        if (data) {
+            profile.value.username = data.username
+            profile.value.first_name = data.first_name
+            profile.value.last_name = data.last_name
+
+
+        }
     }
 
    
