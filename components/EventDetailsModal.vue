@@ -4,7 +4,7 @@
             <template #header>
                 <div class="flex justify-between items-center">
                     <h4 class="font-bold">{{event?.name  }}</h4>
-                    <div class="space-x-4">
+                    <div v-if="canManageEvents" class="space-x-4">
                         <UButton icon="i-heroicons-pencil-square" variant="solid" @click="$emit('editEvent', event)" />
                         <UButton icon="i-heroicons-trash" color="red" @click="$emit('deleteEvent', event.id)"/>
                     </div>
@@ -20,9 +20,10 @@
 
 <script setup lang="ts">
 import { marked } from 'marked';
+import { useUserStore } from '~/stores/user';
 
 const props= defineProps(["event"])
-
+const userStore = useUserStore()
 
 const formatDate = (date: string) => {
     const eventStart = new Date(date)
@@ -46,6 +47,9 @@ const formatTime = (startDate: string, endDate: string) => {
     return `${eventStart.toLocaleTimeString("fr-FR", { hour: 'numeric', minute: 'numeric'})}→${eventEnd.toLocaleTimeString("fr-FR", { hour: 'numeric', minute: 'numeric'})}`
 }
 
+const canManageEvents = computed(() => {
+    return userStore.profile?.permissions['fightClub'].find(p => p == 'eventEdit') 
+})
 
 </script>
 

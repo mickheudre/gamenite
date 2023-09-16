@@ -1,7 +1,7 @@
 <template>
     <UTable :loading="eventsStore.pending" :rows="eventsStore.incomingEvents" :columns="userStore.profile?.permissions['fightClub'].find(p => p == 'eventDelete') ? columnsAdmin : columnsGuest" :sort="{ column: 'start_at',  direction: 'asc' }">
         <template #name-data="{row}">
-            <div class="w-48 md:w-full truncate" @click="$emit('showDetails', row)">{{row.name}}</div>
+            <div class="w-48 md:w-full truncate cursor-pointer" @click="$emit('showDetails', row)">{{row.name}}</div>
         </template>
         <template #start_at-data="{row}">
             <span class="hidden md:flex capitalize">{{ formatDateLong(row.start_at) }}</span>
