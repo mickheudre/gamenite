@@ -32,10 +32,8 @@ const emit = defineEmits(['update:modelValue'])
 const now = new Date()
 
 const updateDate = (date: Date) => {
-    const updatedDate = new Date()
-    updatedDate.setDate(date.getDate())
-    updatedDate.setHours(props.modelValue?.getHours())
-    updatedDate.setMinutes(props.modelValue?.getMinutes())
+    const updatedDate = new Date(date)
+   
     emit("update:modelValue", updatedDate)
 }
 
