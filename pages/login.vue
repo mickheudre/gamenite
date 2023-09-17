@@ -6,6 +6,7 @@
         <UCard class="" >
             <h4 class="text-lg font-semibold mb-4">Se Connecter</h4>
             <UForm
+            ref="form"
             :state="state"
             :validate="validate"
             @submit.prevent="submit"
@@ -16,7 +17,7 @@
             <UFormGroup class="my-4 mb-8" label="Mot de passe" name="password">
                 <UInput v-model="state.password" type="password" />
             </UFormGroup>
-            <UButton type="submit" label="Se connecter" size="xl" :loading="loading" />
+            <UButton type="submit" label="Se connecter" size="xl" :loading="loading" :disabled="form?.errors?.length > 0" trailing/>
         </UForm>
     </UCard> 
 </UContainer>
@@ -32,6 +33,7 @@ definePageMeta({
     layout: "lean",
 });
 
+const form = ref()
 const auth = useAuth()
 
 watch(() => userStore.profile, (newProfile) => {

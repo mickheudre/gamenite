@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/supabase', "@pinia/nuxt", '@nuxthq/ui'],
+  modules: ['@nuxtjs/supabase', "@pinia/nuxt", '@nuxt/ui'],
   supabase: {
     redirectOptions: {
       login: '/login',
