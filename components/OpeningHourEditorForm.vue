@@ -14,7 +14,7 @@
             <UInput type="time" v-model="state.end" />
         </div>
     </UFormGroup>
-    <UFormGroup label="Responsable" name="time">
+    <UFormGroup label="Responsable" name="organizer">
         <USelectMenu v-model="state.organizer" :options="orgStore.keyHolders"  searchable searchable-placeholder="Rechercher ..."> 
             <template #label>
                 {{ orgStore.keyHolders?.find(member => member.id == state.organizer.id).username }}

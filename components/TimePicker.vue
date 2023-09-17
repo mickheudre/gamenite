@@ -1,5 +1,5 @@
 <template>
-<UInput v-model="props.modelValue" type="time" />
+<UInput v-model="props.modelValue" min="00:00" max="23:59" type="time" />
 </template>
 
 <script setup lang="ts">
