@@ -1,5 +1,6 @@
 <template>
         <UForm 
+        ref="form"
         :validate="validateEvent"
         :state="state"
         @submit.prevent="submit"
@@ -21,7 +22,7 @@
             <UTextarea v-model="state.description"/>
         </UFormGroup>
         <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
-        <UButton type="submit" :loading="props.loading">Valider</UButton>
+        <UButton type="submit" :loading="props.loading" label="Valider" :disabled="form?.errors?.length > 0" />
     </UForm>
 
 </template>
@@ -41,6 +42,7 @@ const props = defineProps({
     })
 const emit = defineEmits(['eventRequest', 'cancel'])
 
+const form = ref()
 const state = ref({
     name: props.eventRequest?.event?.name ?? "Nouvel Evénement",
     date: props.eventRequest?.event?.date ?? new Date(),

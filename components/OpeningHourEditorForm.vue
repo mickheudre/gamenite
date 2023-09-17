@@ -1,5 +1,6 @@
 <template>
-    <UForm 
+    <UForm
+    ref="form"
     :validate="validateEvent"
     :state="state"
     @submit.prevent="submit"
@@ -25,7 +26,7 @@
         </USelectMenu>
     </UFormGroup>
     <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
-    <UButton type="submit" :loading="props.loading">Valider</UButton>
+    <UButton type="submit" :loading="props.loading" label="Valider" :disabled="form?.errors?.length > 0" />
 </UForm>
 
 </template>
@@ -41,6 +42,9 @@ import { useOrgStore } from '~/stores/org'
 
 const userStore = useUserStore()
 const orgStore = useOrgStore()
+
+
+const form = ref()
 
 const props = defineProps({
     eventRequest: Object as PropType<EventEditionRequest>,
