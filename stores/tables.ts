@@ -6,7 +6,7 @@ export const useTablesStore = defineStore('tablesStore', () => {
     
     
     const {pending, data: tables, error, refresh} =  useLazyAsyncData('tables', async () => {
-        const {data, error} = await supabase.from("tables").select("*")
+        const {data, error} = await supabase.from("tables").select("*, booking_requests (id, opening_hours, start_at, end_at, width)")
         return data
     })
 

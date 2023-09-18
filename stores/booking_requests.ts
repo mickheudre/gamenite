@@ -23,7 +23,7 @@ export const useBookingRequestsStore = defineStore('bookingRequestsStore', () =>
         const { data, error } = await supabase
         .from("booking_requests")
         .insert(args)
-        .select()
+        .select("*, table (name)")
         .single()
         
         console.log(error)

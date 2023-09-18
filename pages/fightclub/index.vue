@@ -6,7 +6,7 @@
             </template>
             <template #footer>
                 <div class="flex justify-end">
-                    <UButton v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate') ?? false" icon="i-heroicons-plus" @click="createEvent">Ajouter un événement</UButton>
+                    <UButton v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate') ?? false" icon="i-heroicons-plus" @click="createEvent" size="lg">Ajouter un événement</UButton>
                     
                 </div>
             </template>
@@ -419,12 +419,10 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
 <style>
 
 .event {
-    background: rgb(238,174,202);
-    background: radial-gradient(circle, #748cab 0%, #1d2d44 100%);  
-    @apply rounded-md text-white;
+    @apply rounded-md text-white bg-gradient-to-r from-primary-500 to-primary-400;
 }
 .opening_hour { 
-    @apply rounded-md text-white bg-teal-700;
+    @apply rounded-md text-white bg-gradient-to-b from-jungle-green-500 to-jungle-green-400;
 }
 
 .vuecal__cell--selected {
@@ -443,7 +441,6 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     @apply hidden;
 } */
 
-@media (max-width: 640px) {
     .vuecal__time-cell-label {
         @apply hidden 
     };
@@ -454,6 +451,6 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     .vuecal--view-with-time .vuecal__weekdays-headings {
         @apply pl-0 
     };
-}
+
 
 </style>

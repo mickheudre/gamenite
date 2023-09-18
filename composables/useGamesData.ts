@@ -21,10 +21,18 @@
         ]
     }, 
     {
-        name: "Warhammer Age of Sigmar"
+        name: "Warhammer Age of Sigmar",
+        formats: [{
+            name: "Standard",
+            boardSize: { width:36 , height: 36}
+        }]
     },
     {
-        name: "Horus Heresy"
+        name: "Horus Heresy",
+        formats: [{
+            name: "Standard",
+            boardSize: { width:36 , height: 36}
+        }]
     },
     {
         name: "Marvel : Crisis Protocol",
@@ -34,10 +42,27 @@
         }]
     },
     {
-        name:  "King of War"
+        name:  "King of War",
+        formats: [{
+            name: "Standard",
+            boardSize: { width:36 , height: 36}
+        }]
     },
     {
         name: "Star Wars Legion",
+        formats: [
+            { 
+                name: "Standard",
+                boardSize: { width:72 , height: 36}
+            },
+            { 
+                name: "Skirmish",
+                boardSize: { width:36 , height: 36}
+            }
+        ]
+    },
+    {
+        name: "Autre",
         formats: [
             { 
                 name: "Standard",
