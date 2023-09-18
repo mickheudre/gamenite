@@ -1,6 +1,6 @@
 <template>
   <UContainer class="space-y-8">
-    <h1 class="text-2xl font-semibold"> Salut {{ userStore.profile ? userStore.profile.username : ''}}</h1>
+    <h1 class="text-2xl font-semibold"> Salut {{ userStore.profile ? userStore.profile.username : ''}} ✌️</h1>
     
     <UCard class="md:w-1/2" :ui="{background: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-red-500'}" @click="navigateTo('/fightClub')">
       <div class="flex justify-between items-center">
@@ -16,7 +16,7 @@
       <TableBookingWidget class="md:w-1/3"/>
       <UCard class="md:w-2/3">
         <template #header>
-          <h4 class="text-xl font-semibold text-white">Prochaines parties</h4>
+          <h4 class="text-xl font-semibold dark:text-white text-gray-900">Mes prochaines parties</h4>
         </template>
         <UTable :rows="bookingRequestStore.userBookingRequests" :columns="bookingRequestscolumns" :loading="bookingRequestStore.pending"  >
           <template #table-data="{row}">
@@ -33,7 +33,7 @@
     </div>
     <UCard class="my-4" v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'openingHoursCreate')">
       <template #header>
-        <h4>Mes horaires d'ouverture</h4>
+        <h4 class="text-xl font-semibold dark:text-white text-gray-900">Mes horaires d'ouverture</h4>
       </template>
       <OpeningHoursList />
     </UCard>

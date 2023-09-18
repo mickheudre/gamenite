@@ -2,13 +2,14 @@
     <UCard class="md:w-1/2" :ui="{background: 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500', body: { base: 'space-y-4'}}">
         <template #header>
             <div class="flex space-x-2 items-center">
-                <UIcon name="i-heroicons-calendar-days-solid" class="text-2xl"/>
+                <UIcon name="i-heroicons-calendar-days-solid" class="text-2xl text-white"/>
                 <h4 class="text-xl font-semibold text-white">Réserver une partie</h4>
             </div>
         </template>
         <UForm
         ref="form"
         :state="model"
+        :validate="validate"
         @submit.prevent="bookTable"
         >
         
@@ -24,7 +25,7 @@
             </USelectMenu>
         </UFormGroup>
         <UFormGroup  label="Format" :ui="labelOptions">
-            <USelectMenu v-model="model.format" :options="games.find(game => game.name === model.game?.name)?.formats" :ui="selectMenuOptions">
+            <USelectMenu v-model="model.format" :options="games.find(game => game.name === model.game?.name)?.formats" :ui="selectMenuOptions" :disabled="!model.game">
                 <template #option="{ option}">
                     <span>{{ `${option.name} - ${option.boardSize.height}"x${option.boardSize.width}"` }}</span>
                 </template>
@@ -34,27 +35,27 @@
             </USelectMenu>
         </UFormGroup>
         <UFormGroup label="Créneaux de jeu disponibles" :ui="labelOptions">
-            <USelectMenu v-model="model.opening_hour" :options="availableHours" :ui="selectMenuOptions" value-attribute="openingHours">
+            <USelectMenu v-model="model.opening_hours" :options="availableHours" :ui="selectMenuOptions" value-attribute="openingHours" :disabled="!model.format">
                 <template #option="{ option}">
                     <span>{{ formatDate(option.openingHours.start_at, option.openingHours.end_at) }}</span>
                 </template>
                 <template #label>
-                    <span>{{model.opening_hour ? formatDate(model.opening_hour?.start_at, model.opening_hour?.end_at) : "Créneaux de jeu"}}</span>
+                    <span>{{model.opening_hours ? formatDate(model.opening_hours?.start_at, model.opening_hours?.end_at) : "Créneaux de jeu"}}</span>
                 </template>
             </USelectMenu>
         </UFormGroup>
         <UFormGroup label="Horaires" :ui="{'container': 'mt-1 flex w-full items-center', ...labelOptions}">
-            <UInput class="time-input" type="time"  v-model="model.start_at"  :ui="selectMenuOptions"/>
+            <UInput class="time-input" type="time"  v-model="model.start_at"  :ui="selectMenuOptions" :disabled="!model.opening_hours"/>
             <span class="mx-2 text-white">→</span>
-            <UInput class="time-input" type="time" v-model="model.end_at" :ui="selectMenuOptions" />
+            <UInput class="time-input" type="time"  v-model="model.end_at" :ui="selectMenuOptions" :disabled="!model.opening_hours"/>
         </UFormGroup>
         <UFormGroup label="Tables disponible" :ui="labelOptions">
-            <USelectMenu v-model="model.table" :options="availableTables" :ui="selectMenuOptions" >
+            <USelectMenu v-model="model.table" :options="availableTables" :ui="selectMenuOptions" :disabled="!model.opening_hours">
                 <template #option="{ option}">
                     <span>{{ option.name }}</span>
                 </template>
                 <template #label>
-                    <span>{{model.table?.name ?? `${tablesStore.tables?.length} tables disponible${tablesStore.tables?.length == 1 ? '' : 's'}`}}</span>
+                    <span>{{model.table?.name ?? availableTables ? `${availableTables?.length} tables disponible${availableTables?.length == 1 ? '' : 's'}` : "Impossible de Réserver"}}</span>
                 </template>
             </USelectMenu>
         </UFormGroup>
@@ -79,27 +80,46 @@ const tablesStore = useTablesStore()
 
 const selectMenuOptions = {color: { white: {outline:'shadow-sm bg-gray-800/50 dark:bg-gray-800/50 text-white dark:text-white ring-1 ring-inset ring-gray-700/50  focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400'}}, icon: {base: 'text-white dark:text-white'}}
 const labelOptions = {label: { base: "block font-medium text-white dark:text-white"}}
-const model = ref({game: null, format: null, opening_hour: null, start_at: null, end_at: null, table: null})
+const model = ref({game: null, format: null, opening_hours: null, start_at: null, end_at: null, table: null})
 const games = useGamesData
 
+const minHour = ref()
+const maxHour = ref()
 const availableHours = ref([])
 const availableTables = computed(() => {
-    if (!model.value.opening_hour) {
+    if (!model.value.opening_hours) {
         return []
     }
     if (availableHours.value.length == 0) {
         return []
     }
-    return availableHours.value.find(hours => hours.openingHours.id === model.value.opening_hour.id)?.tables
+    return availableHours.value.find(hours => hours.openingHours.id === model.value.opening_hours.id)?.tables
 })
 
 watch(() => model.value.game, (game) => {
+    console.log(game)
     const gameObject = games.find(g => g.name === game.name)
+
     if (gameObject?.formats.length == 1) {
         model.value.format = gameObject.formats[0]
+    } else {
+        model.value.format = null
     }
+    model.value.opening_hours = null
+    model.value.start_at = null
+    model.value.end_at = null
+    model.value.table = null
 })
 watch(() =>  model.value.format, (format) => {
+    model.value.opening_hours = null
+    model.value.start_at = null
+    model.value.end_at = null
+    model.value.table = null
+    
+    if (!model.value.format) {
+        availableHours.value = []
+        return
+    }
     const tables = tablesStore.tables
     const allOpeningHours = openingHoursStore.incomingOpeningHours
     const availableOpeningHours = []
@@ -113,7 +133,7 @@ watch(() =>  model.value.format, (format) => {
                     booked_width += br.width
                 }
             })
-            if ((table.width - booked_width) > format.boardSize.width) {
+            if ((table.width - booked_width) >= format.boardSize.width) {
                 availableTables.push({id: table.id, name: table.name})
             }
         })
@@ -123,15 +143,20 @@ watch(() =>  model.value.format, (format) => {
     })
     
     availableHours.value = availableOpeningHours
+
 })
 
-watch(() => model.value.opening_hour, (openingHour) => {
+watch(() => model.value.opening_hours, (openingHour) => {
     model.value.start_at = new Date(openingHour?.start_at).toLocaleTimeString("fr-FR", { hour12: false })
     model.value.end_at = new Date(openingHour?.end_at).toLocaleTimeString("fr-FR", { hour12: false })
 })
 
+const validate = () => {
+    
+}
+
 const bookTable = async () => {
-    const day = new Date(model.value.opening_hour.start_at).toDateString()
+    const day = new Date(model.value.opening_hours.start_at).toDateString()
     const startDate = new Date(day + ' ' + model.value.start_at)
     const endDate = new Date(day + ' ' + model.value.end_at)
     await bookingRequestStore.addBookingRequest({...model.value, start_at: startDate, end_at: endDate})

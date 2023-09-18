@@ -18,7 +18,7 @@ export const useBookingRequestsStore = defineStore('bookingRequestsStore', () =>
     })
     
     const addBookingRequest = async (model) => {
-        const args = {user: user.value.id, opening_hour: model.opening_hour.id, start_at: model.start_at, end_at: model.end_at, game: model.game.name, table: model.table.id, width: model.format.boardSize.width}
+        const args = {user: user.value.id, opening_hours: model.opening_hours.id, start_at: model.start_at, end_at: model.end_at, game: model.game.name, table: model.table.id, width: model.format.boardSize.width}
         console.log(args)
         const { data, error } = await supabase
         .from("booking_requests")
