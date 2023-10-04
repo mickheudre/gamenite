@@ -1,5 +1,5 @@
 <template>
-    <UContainer class="flex flex-col  justify-center h-screen space-y-8" :ui="{'constrained': 'max-w-2xl'}">
+    <UContainer class="flex flex-col  justify-center h-screen space-y-8" :ui="{'constrained': 'max-w-xl'}">
         <a href="#" class="text-2xl font-semibold text-gray-900 dark:text-white mx-auto">
             Tabletop Social Club  
         </a>

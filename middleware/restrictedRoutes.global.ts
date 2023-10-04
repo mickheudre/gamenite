@@ -3,7 +3,6 @@ import { useUserStore } from "~/stores/user"
 export default defineNuxtRouteMiddleware((to, from) => {
     const userStore = useUserStore()
 
-    console.log(to.fullPath,  userStore.profile)
     if (to.fullPath === "/fightClub/members" ) {
         let isAdmin =  false
 

@@ -4,7 +4,8 @@ export const useEventsStore = defineStore('eventsStore', () => {
     
     const supabase = useSupabaseClient()
     const user = useSupabaseUser()
-    
+
+    const fightClubId = "fc791731-3a07-4125-9b3d-4969815290a5"
     
     const {pending, data: events, error, refresh} =  useLazyAsyncData('events', async () => {
         const {data, error} = await supabase.from("events").select("*")
@@ -19,7 +20,7 @@ export const useEventsStore = defineStore('eventsStore', () => {
     const addEvent = async (event) => {
         const { data, error } = await supabase
         .from('events')
-        .insert({...event, org: 1, organizer: user.value.id})
+        .insert({...event, org: fightClubId, organizer: user.value.id})
         .select()
         .single()
 

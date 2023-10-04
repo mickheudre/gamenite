@@ -21,6 +21,16 @@
         <UFormGroup label="Description" name="description">
             <UTextarea v-model="state.description"/>
         </UFormGroup>
+        <!-- <UFormGroup label="Tables" name="tables" >
+            <USelectMenu :options="tableStore.tables" v-model="state.tables" multiple>
+                <template #option="{option}">
+                {{ option.name }}
+                </template>
+                <template #label>
+                    {{ state.tables.length + " tables réservées" }}
+                </template>
+            </USelectMenu>
+        </UFormGroup> -->
         <UButton variant="ghost" @click="$emit('cancel')">Annuler</UButton>
         <UButton type="submit" :loading="props.loading" label="Valider" :disabled="form?.errors?.length > 0" />
     </UForm>
@@ -32,7 +42,7 @@
 
 
 import type { PropType } from 'vue'
-
+import { useTablesStore } from '~/stores/tables';
 import type { FormError, FormSubmitEvent } from '@nuxt/ui/dist/runtime/types'
 import { EventEditionRequest } from '~/types/global';
 
@@ -42,13 +52,15 @@ const props = defineProps({
     })
 const emit = defineEmits(['eventRequest', 'cancel'])
 
+const tableStore = useTablesStore()
 const form = ref()
 const state = ref({
     name: props.eventRequest?.event?.name ?? "Nouvel Evénement",
     date: props.eventRequest?.event?.date ?? new Date(),
     start: props.eventRequest?.event?.start ?? "10:00",
     end: props.eventRequest?.event?.end ?? "18:00",
-    description: props.eventRequest?.event?.description ?? undefined
+    description: props.eventRequest?.event?.description ?? undefined,
+    tables: props.eventRequest?.tables ?? []
 })
 
 const validateEvent = (state: any): FormError[] => {

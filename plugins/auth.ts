@@ -12,14 +12,13 @@ export default defineNuxtPlugin({
     const userStore = useUserStore()
     const eventsStore = useEventsStore()
     const openingHoursStore = useOpeningHoursStore()
-
+    
     supabase.auth.onAuthStateChange( async (event: AuthChangeEvent, session: Session | null) => {
 
       rolesStore.refresh()
       userStore.refresh()
       eventsStore.refresh()
       openingHoursStore.refresh()
-
     })
     
   },

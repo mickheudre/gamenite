@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('userStore', () => {
     
+    const fightClubId = "fc791731-3a07-4125-9b3d-4969815290a5"
     
     const user =  useSupabaseUser()
     
@@ -20,11 +21,14 @@ export const useUserStore = defineStore('userStore', () => {
         
         const {data : dataRoles, error: errorRoles}  = await supabase.from("roles").select("org (id, name) , roles").eq("user", user.value.id)
 
-        if (dataRoles?.find(role => (role.org.id == 1) && role.roles.find(role => role === 'admin') )) {
+        if (dataRoles?.find(role => (role.org.id == fightClubId) && role.roles.find(role => role === 'admin') )) {
                 permissions.value.fightClub.push('eventCreate', 'eventEdit', 'eventDelete', 'openingHoursCreate', 'openingHoursEdit', 'openingHoursDelete')
             }
-            if (dataRoles?.find(role => (role.org.id == 1) && role.roles.find(role => role === 'keys') )) {
+            if (dataRoles?.find(role => (role.org.id == fightClubId) && role.roles.find(role => role === 'keys') )) {
                 permissions.value.fightClub.push('openingHoursCreate', 'openingHoursEdit', 'openingHoursDelete')
+            }
+            if (dataRoles?.find(role => (role.org.id == fightClubId) && role.roles.find(role => role === 'keys') )) {
+                permissions.value.fightClub.push('bookTable')
             }
 
         return {...dataUser, roles: dataRoles, permissions}

@@ -3,15 +3,15 @@
         <UCard>
             <template #header>
                 <div class="flex justify-between items-center">
-                    <h4 class="font-bold">{{event?.name  }}</h4>
-                    <div v-if="canManageEvents" class="space-x-4">
-                        <UButton icon="i-heroicons-pencil-square" variant="solid" @click="$emit('editEvent', event)" />
-                        <UButton icon="i-heroicons-trash" color="red" @click="$emit('deleteEvent', event.id)"/>
-                    </div>
+                    <h4 class="font-bold text-xl mb-4">{{event?.name  }}</h4>
                 </div>
+                <div class="flex justify-between items-center">
+                <span class="capitalize">{{ formatDate(event.start_at) }}</span>
+                <div class="border rounded-md items-center flex space-x-2 p-1 px-2"><UIcon name="i-heroicons-clock"/><span > {{ `${formatTime(event.start_at, event.end_at)}`  }}</span></div>
+                
+            </div>
             </template>
-            <div class="border rounded-md items-center flex space-x-2 p-2"><UIcon name="i-heroicons-calendar-days-20-solid"/><span class="capitalize"> {{ `${formatDate(event.start_at)} ${formatTime(event.start_at, event.end_at)}`  }}</span></div>
-            
+
             <div class="list-disc" v-html="markdown" />
             
         </UCard>

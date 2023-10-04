@@ -34,5 +34,6 @@ export interface EventEditionRequest {
   mode: 'create' | 'edit' | 'delete'
   type: 'event' | 'opening_hour'
   id?: string
-  event?: BasicEvent | BasicOpeningHour
+  event?: BasicEvent | BasicOpeningHour,
+  tables?: Array<string>
 }
