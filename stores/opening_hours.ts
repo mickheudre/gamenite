@@ -4,7 +4,8 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
     
     const supabase = useSupabaseClient()
     const user = useSupabaseUser()
-    
+    const fightClubId = "fc791731-3a07-4125-9b3d-4969815290a5"
+
     
     const {pending, data: openingHours, error, refresh} =  useLazyAsyncData('opening_hours', async () => {
         const now = new Date()
@@ -12,7 +13,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         if( day !== 1 )
             now.setHours(-24 * (day - 1));
 
-        const {data, error} = await supabase.from("opening_hours").select("*, org(id, name), organizer (id, username)").gte("start_at", now.toISOString())
+        const {data, error} = await supabase.from("opening_hours").select("*,  org (id, name), organizer (id, username)").gte("start_at", now.toISOString())
         const events = ref([])
         return data
     })
@@ -39,7 +40,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
     const addOpeningHour = async (openingHour) => {
         const { data, error } = await supabase
         .from('opening_hours')
-        .insert({...openingHour, org: 1})
+        .insert({...openingHour, org: fightClubId})
         .select("*, organizer (id, username)")
         .single()
         

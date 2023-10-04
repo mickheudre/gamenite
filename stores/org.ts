@@ -5,9 +5,10 @@ export const useOrgStore = defineStore('orgStore', () => {
     const supabase = useSupabaseClient()
     const user = useSupabaseUser()
     
+    const fightClubId = "fc791731-3a07-4125-9b3d-4969815290a5"
 
     const {pending, data: members, error, refresh} =  useLazyAsyncData('orgRoles', async () => {
-        const {data, error} = await supabase.from("roles").select("user (id, username), roles").eq('org', 1)
+        const {data, error} = await supabase.from("roles").select("user (id, username), roles").eq('org', fightClubId)
         return data
     })
     

@@ -1,5 +1,5 @@
 <template>
-    <UCard class="md:w-1/2" :ui="{background: 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500', body: { base: 'space-y-4'}}">
+    <UCard  :ui="{background: 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500', body: { base: 'space-y-4'}}">
         <template #header>
             <div class="flex space-x-2 items-center">
                 <UIcon name="i-heroicons-calendar-days-solid" class="text-2xl text-white"/>

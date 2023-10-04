@@ -3,38 +3,34 @@
         <!-- <UCard class="flex-none h-fit sticky top-48 mx-8">
             <h5 class="font-bold mb-4 mx-4 text-gray-400 dark:text-gray-300">Fight Club</h5>
             <UVerticalNavigation :links="links" />
-        </UCard>
-    -->
-    <UContainer class="grow">
-        <h1 class="text-2xl font-bold">Bienvenue au Fight Club</h1>
-        <UCard id="planning" class="my-8" :ui="{ body: { padding: 'p-2 sm:p-4' } }">
-            <template #header>
-                <div class="flex items-center space-x-4">
-                    <UIcon name="i-heroicons-home" class="text-2xl"/>
-                    
-                    <h4 class="text-xl font-semibold">Cette semaine au club</h4>
-                </div>
-            </template>
-            <vue-cal v-if="!loading"
-            locale="fr"
-            :events="eventsCal"
-            hide-view-selector
-            :time-from="9 * 60"
-            :time-to="24 * 60"
-            :disable-views="['years', 'year', 'month', 'day']"
-            :on-event-click="onEventClick">
-            
-            <template  #title="{ title, view }">
-                <span class="capitalize font-semibold text-lg"> {{ calendarTitle(view.startDate)  }}</span>
-            </template>
-            
-            
-            <template #event="{ event, view }">
-                <div class="relative h-full w-full p-2">
-                    <div v-if="event.class=== 'event'" class="absolute top-0 left-1.5 bottom-0 w-1.5 bg-jungle-green-500">
+        </UCard> -->
+        
+        <UContainer class="grow">
+            <h1 class="text-2xl font-bold">Bienvenue au Fight Club</h1>
+            <UCard id="planning" class="my-8" :ui="{ body: { padding: 'p-2 sm:p-4' } }">
+                <template #header>
+                    <div class="flex items-center space-x-4">
+                        <UIcon name="i-heroicons-home" class="text-2xl"/>
                         
+                        <h4 class="text-xl font-semibold">Cette semaine au club</h4>
                     </div>
-                    <div class="vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 flex flex-col items-center justify-center" >
+                </template>
+                <vue-cal v-if="!loading && !userCanManageEvent"
+                locale="fr"
+                :events="eventsCal"
+                hide-view-selector
+                :time-from="9 * 60"
+                :time-to="24 * 60"
+                :disable-views="['years', 'year', 'month', 'day']">
+                
+                <template  #title="{ title, view }">
+                    <span class="capitalize font-semibold text-lg"> {{ calendarTitle(view.startDate)  }}</span>
+                </template>
+                
+                
+                <template #event="{ event, view }">
+                    
+                    <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
                         <span>{{ event.title }}</span>
                         
                     </div>
@@ -43,11 +39,54 @@
                         <div class="flex flex-col md:flex-row justify-center items-center"><span>{{ event.start.formatTime() }}</span><span>→</span><span>{{ event.end.formatTime() }}</span></div>
                     </small>
                     
-                    <div class="flex flex-col justify-end items-center my-4">
-                        <UButton v-if="event.class=='opening_hour' && userCanBookTable" @click="bookTable(event)" variant="ghost" color="black">Réserver une table</UButton>
+                    <div class="flex flex-col justify-end items-center h-auto">
+                        <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
+                            <UAvatar :alt="event.organizer.username" size="sm" />
+                        </UTooltip>
+                        <UButton v-if="event.class=='opening_hour'" @click="" variant="link">Réserver une table</UButton>
                     </div>
-                </div>
+                    
+                </template>
+            </vue-cal>
+            <vue-cal v-if="!loading && userCanManageEvent"
+            locale="fr"
+            :events="eventsCal"
+            hide-view-selector
+            :time-from="9 * 60"
+            :time-to="24 * 60"
+            :snap-to-time="15"
+            :disable-views="['years', 'year', 'month', 'day']"
+            :editable-events="{ title: false, drag: false, resize: false, delete: false, create: true }"
+            :drag-to-create-threshold="15"
+            :drag-to-create-event="allowDragAndDrop"
+            @cell-dblclick="onEventCreateClick"
+            @event-create="onEventCreateStart"
+            @event-drag-create="onEventCreate"
+            :on-event-click="onEventClick">
+            
+            <template  #title="{ title, view }">
+                <span class="capitalize font-semibold text-lg"> {{ calendarTitle(view.startDate)  }}</span>
             </template>
+            
+            <template #event="{ event, view }">
+                
+                <div class="vuecal__event-title my-2 md:mx-2 text-white flex flex-col items-center justify-center" >
+                    <span>{{ event.title }}</span>
+                    
+                </div>
+                
+                <small class="vuecal__event-time text-white">
+                    <div class="flex flex-col md:flex-row justify-center items-center"><span>{{ event.start.formatTime() }}</span><span>→</span><span>{{ event.end.formatTime() }}</span></div>
+                </small>
+                
+                <div class="flex flex-col justify-end items-center h-auto">
+                    <UTooltip class="m-2" v-if="event.organizer" :text="event.organizer.username" >
+                        <UAvatar :alt="event.organizer.username" size="sm" />
+                    </UTooltip>
+                </div>
+                
+            </template>
+            
         </vue-cal>
         
     </UCard>
@@ -56,6 +95,12 @@
             <UIcon name="i-heroicons-calendar-days" class="text-2xl"/>
             <h4 class="text-xl font-semibold">Prochains événements</h4>
         </div>
+        <template #footer>
+            <div class="flex justify-end">
+                <UButton v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate') ?? false" icon="i-heroicons-plus" @click="createEvent" size="lg">Ajouter un événement</UButton>
+                
+            </div>
+        </template>
         <EventList @showDetails="showDetails" @edit-event="editEvent" @delete-event="deleteEvent"/>
         
         
@@ -66,11 +111,6 @@
     <EventEditor v-model="isOpen" :event-request="eventRequest" @update="handleEventRequest" @cancel="cancelEvent" :loading="awaitingForResponse"/>
     
 </UContainer>
-<UModal v-model="bookingFormVisible">
-    <UCard>
-        <TableBookingSimpleWidget  :opening-hours="bookingInfo" @booking-success="onBookingSuccess"/>
-    </UCard>
-</UModal>
 </div>
 
 </template>
@@ -91,12 +131,10 @@ const userStore = useUserStore()
 const openingHoursStore = useOpeningHoursStore()
 const {openingHours, pending} = storeToRefs(openingHoursStore)
 const eventsCal = ref([])
-const toast = useToast()
 
-const bookingFormVisible = ref(false)
-const bookingInfo = ref()
+
 eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event"}))
-openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour", background: true}))
+openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour"}))
 
 
 const awaitingForResponse = ref(false)
@@ -117,11 +155,6 @@ const showDetails = (event) => {
     currentEvent.value = event
 }
 
-const bookTable = (event) => {
-    const openingHours = openingHoursStore.openingHours?.find(oh => oh.id === event.id)
-    bookingInfo.value = openingHours
-    bookingFormVisible.value = true
-}
 
 const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     
@@ -144,6 +177,58 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     })
     
     
+    const onEventCreateClick = (event) => {
+        
+        const start = new Date(event)
+        start.setMinutes(0)
+        const end = new Date(start)
+        end.setHours(start.getHours() + 4)
+        eventRequest.value = {
+            mode: 'create',
+            type: 'opening_hour',
+            event: {
+                name: "Nouvel Evénement",
+                date: new Date(start),
+                start: new Date(start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+            }
+        }
+        
+        
+        isOpen.value = true
+    }
+    
+    const onEventCreateStart = (event, deleteEvent) => {
+        
+        if (newCalEventObject.event == null) {
+            newCalEventObject.event = event
+        }
+        
+        if (deleteEvent) {
+            newCalEventObject.deleteFunction = deleteEvent
+        }
+        return event
+    }
+    
+    
+    
+    const onEventCreate = (event) => {
+        
+        eventRequest.value = {
+            mode: 'create',
+            type: 'opening_hour',
+            event: {
+                name: "Nouvel Evénement",
+                date: new Date(event.start),
+                start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+            }
+        }
+        
+        
+        isOpen.value = true
+        return event
+    }
     
     const cancelEvent = () => {
         isOpen.value = false
@@ -175,6 +260,14 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         isOpen.value = true
     }
     
+    
+    const createEvent = () => {
+        eventRequest.value = {
+            mode: 'create',
+            type: 'event'
+        }
+        isOpen.value = true
+    }
     
     
     const deleteEvent = async (eventId) => {
@@ -226,7 +319,6 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 if (eventRequest.type === 'opening_hour') {
                     
                     const {data, error} = await openingHoursStore.addOpeningHour({start_at: startDate, end_at: endDate, organizer: eventRequest.event.organizer.id})
-                    console.log(data, error)
                     if (data && newCalEventObject.event) {
                         newCalEventObject.event.title = "Ouvert"
                         newCalEventObject.event.class = "opening_hour"
@@ -298,12 +390,23 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         newCalEventObject.deleteFunction = null
     }
     
-    const onBookingSuccess = () => {
-        bookingFormVisible.value = false
-        toast.add({title: "Table réservée avec succés !"})
-        
-    }   
-    
+    const links = [
+    {
+        label: 'Planning de la semaine',
+        icon: 'i-heroicons-home'
+    }, {
+        label: 'Evénements',
+        icon: 'i-heroicons-calendar-days'
+    },
+    {
+        label: 'Informations pratiques',
+        icon: 'i-heroicons-information-circle'
+    },
+{
+    label: "Espace administrateur",
+    icon: 'i-heroicons-key',
+    to: 'fightClub/admin'
+}]
     
     
     onMounted(() => {
@@ -311,16 +414,22 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     })
     
     const onEventClick = (event, e) => {
-        if (event.class == 'event') {
-            
-            const found = eventsStore.events?.find(ev => ev.id === event.id)
-            if (found) {
-
-                showDetailsModal.value  = true
-                currentEvent.value = found
+        
+        eventRequest.value = {
+            mode: 'edit',
+            type: event.class,
+            id: event.id,
+            event: {
+                name: event.title,
+                description: event.description,
+                date: new Date(event.start),
+                start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
+                organizer: event.organizer
             }
-            
         }
+        
+        isOpen.value = true    
         
         e.stopPropagation()
     }
@@ -331,53 +440,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         return eventStart.toLocaleString('fr-FR', { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", hour12: false }) 
     }
     
-    const userCanBookTable = computed(() => {
-        return userStore.profile?.permissions['fightClub'].find(p => p == 'bookTable')
+    const userCanManageEvent = computed(() => {
+        return userStore.profile?.permissions['fightClub'].find(p => p == 'eventCreate' || p == 'openingHoursCreate')
     })
 </script>
 
-
-<style>
-
-.event {
-    @apply rounded-md text-white bg-gradient-to-r from-primary-600 to-primary-500;
-}
-.opening_hour { 
-    @apply rounded-md text-white bg-gradient-to-b from-jungle-green-500 to-jungle-green-400;
-}
-
-.vuecal__cell--selected {
-    @apply bg-transparent;
-}
-
-.vuecal__cell--today {
-    @apply bg-transparent;
-}
-
-.vuecal__no-event {
-    @apply hidden
-}
-
-.vuecal__title-bar {
-    @apply bg-transparent
-}
-
-/* .vuecal__title-bar {
-    @apply hidden;
-} */
-
-
-.vuecal__time-cell-label {
-    @apply text-xs leading-10 ml-1
-};
-
-
-.vuecal__time-column {
-    @apply w-0 
-};
-.vuecal--view-with-time .vuecal__weekdays-headings {
-    @apply pl-0 
-};
-
-
-</style>

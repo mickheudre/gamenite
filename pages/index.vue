@@ -12,7 +12,7 @@
       
     </UCard>
     
-    <div class="flex space-x-8">
+    <div  v-if="userStore.profile?.permissions['fightClub'].find(p => p == 'bookTable')" class="flex space-x-8">
       <TableBookingWidget class="md:w-1/3"/>
       <UCard class="md:w-2/3">
         <template #header>

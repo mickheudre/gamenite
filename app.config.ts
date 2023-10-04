@@ -11,8 +11,15 @@ export default defineAppConfig({
         td: {
           color: "text-gull-gray-900 dark:text-gull-gray-500"
         }
+      },
+      verticalNavigation: {
+        font: "font-base",
+        active: "text-gray-900 dark:text-white before:bg-gray-100 dark:before:bg-gray-800",
+        inactive: "text-gray-500 dark:text-gull-gray-500 hover:text-gray-900 dark:hover:text-white hover:before:bg-gray-50 dark:hover:before:bg-gray-800/50",
+      },
+      notifications: {
+        position: 'top-0 right-0'
       }
-
     }
   })
   
