@@ -3,16 +3,16 @@
         <!-- <UCard class="flex-none h-fit sticky top-48 mx-8">
             <h5 class="font-bold mb-4 mx-4 text-gray-400 dark:text-gray-300">Fight Club</h5>
             <UVerticalNavigation :links="links" />
-        </UCard>
-    -->
+        </UCard> -->
+   
     <UContainer class="grow">
         <h1 class="text-2xl font-bold">Bienvenue au Fight Club</h1>
         <UCard id="planning" class="my-8" :ui="{ body: { padding: 'p-2 sm:p-4' } }">
             <template #header>
                 <div class="flex items-center space-x-4">
-                    <UIcon name="i-heroicons-home" class="text-2xl"/>
+                    <UIcon name="i-heroicons-building-storefront" class="text-2xl"/>
                     
-                    <h4 class="text-xl font-semibold">Cette semaine au club</h4>
+                    <h4 class="text-xl font-semibold">Planning de la semaine</h4>
                 </div>
             </template>
             <vue-cal v-if="!loading"
@@ -34,9 +34,11 @@
                     <div v-if="event.class=== 'event'" class="absolute top-0 left-1.5 bottom-0 w-1.5 bg-jungle-green-500">
                         
                     </div>
-                    <div class="vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 flex flex-col items-center justify-center" >
-                        <span>{{ event.title }}</span>
-                        
+                    <div class="vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 items-center justify-center" >
+                        <UIcon v-if="event.class=='opening_hour'" class="text-xl" name="i-heroicons-building-storefront" />
+                        <UIcon v-if="event.class=='event'" class="text-xl" name="i-heroicons-trophy" />
+
+                        <span class="hidden sm:block">{{ event.title }}</span>
                     </div>
                     
                     <small class="vuecal__event-time text-white">
@@ -52,10 +54,12 @@
         
     </UCard>
     <UCard id="calendrier" class="my-8">
+        <template #header>
         <div class="flex items-center space-x-4">
             <UIcon name="i-heroicons-calendar-days" class="text-2xl"/>
             <h4 class="text-xl font-semibold">Prochains événements</h4>
         </div>
+    </template>
         <EventList @showDetails="showDetails" @edit-event="editEvent" @delete-event="deleteEvent"/>
         
         
@@ -142,6 +146,17 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
             }
         }
     })
+    
+    const links = [
+    {
+        label: 'Planning de la semaine',
+        icon: 'i-heroicons-home',
+        links: '#planning'
+    }, {
+        label: 'Evénements',
+        icon: 'i-heroicons-calendar-days',
+        links: '#calendrier'
+    }]
     
     
     
@@ -373,10 +388,10 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
 
 
 .vuecal__time-column {
-    @apply w-0 
+    @apply w-0 sm:w-10 
 };
 .vuecal--view-with-time .vuecal__weekdays-headings {
-    @apply pl-0 
+    @apply pl-0 sm:pl-10
 };
 
 
