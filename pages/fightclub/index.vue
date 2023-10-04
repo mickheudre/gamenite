@@ -30,23 +30,23 @@
             
             
             <template #event="{ event, view }">
-                <div class="relative h-full w-full p-2">
-                    <div v-if="event.class=== 'event'" class="absolute top-0 left-1.5 bottom-0 w-1.5 bg-jungle-green-500">
-                        
-                    </div>
-                    <div class="vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 items-center justify-center" >
+                <div class="relative h-full w-full p-2 z-0" @click="onEventClick(event, null)">
+
+                    <div class="relative vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 items-center justify-center z-30 " >
                         <UIcon v-if="event.class=='opening_hour'" class="text-xl" name="i-heroicons-building-storefront" />
                         <UIcon v-if="event.class=='event'" class="text-xl" name="i-heroicons-trophy" />
 
                         <span class="hidden sm:block">{{ event.title }}</span>
                     </div>
                     
-                    <small class="vuecal__event-time text-white">
+                    <small class="relatice vuecal__event-time text-white z-30">
                         <div class="flex flex-col md:flex-row justify-center items-center"><span>{{ event.start.formatTime() }}</span><span>→</span><span>{{ event.end.formatTime() }}</span></div>
                     </small>
                     
-                    <div class="flex flex-col justify-end items-center my-4">
+                    <div class="relative flex flex-col justify-end items-center my-4 z-30">
                         <UButton v-if="event.class=='opening_hour' && userCanBookTable" @click="bookTable(event)" variant="ghost" color="black">Réserver une table</UButton>
+                    </div>
+                    <div v-if="event.class=== 'event'" class="absolute top-0 left-0.5 sm:left-1.5 bottom-0 w-0.5 sm:w-1.5 bg-jungle-green-500 -z-10">
                     </div>
                 </div>
             </template>
@@ -337,7 +337,9 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
             
         }
         
-        e.stopPropagation()
+        if (e) {
+            e.stopPropagation()
+        }
     }
     
     const formatDate = (date: string) => {
