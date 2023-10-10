@@ -133,7 +133,7 @@ const {openingHours, pending} = storeToRefs(openingHoursStore)
 const eventsCal = ref([])
 
 
-eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event"}))
+eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, url: event.url, class: "event"}))
 openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour"}))
 
 
@@ -253,7 +253,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 date: new Date(event.start_at),
                 start: new Date(event.start_at).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
                 end: new Date(event.end_at).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
-                description: event.description
+                description: event.description,
+                url: event.url
             }
         }
         showDetailsModal.value = false
@@ -304,7 +305,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 const {startDate, endDate} = basicEventDateTimeToDate(eventRequest.event)
                 
                 if (eventRequest.type === 'event') {
-                    const {data, error } = await eventsStore.addEvent({name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
+                    const {data, error } = await eventsStore.addEvent({name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate, url: eventRequest.event.url})
                     if (data && newCalEventObject.event) {
                         newCalEventObject.event.title = data.name
                         newCalEventObject.event.class = "event"
@@ -339,11 +340,10 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
         if (eventRequest.mode === 'edit') {
             
             if (eventRequest.event && eventRequest.id) {
-                
                 const {startDate, endDate} = basicEventDateTimeToDate(eventRequest.event)
                 
                 if (eventRequest.type === 'event') {
-                    const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
+                    const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate, url: eventRequest.event.url})
                     if (data) {
                         const found = eventsCal.value.find(ev => ev.id === data.id)
                         if (found) {
@@ -425,7 +425,8 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 date: new Date(event.start),
                 start: new Date(event.start).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
                 end: new Date(event.end).toLocaleTimeString("fr", {hour: 'numeric', minute: 'numeric'}),
-                organizer: event.organizer
+                organizer: event.organizer,
+                url: event.url
             }
         }
         

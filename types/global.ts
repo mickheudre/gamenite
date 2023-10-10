@@ -20,7 +20,8 @@ export interface BasicEvent {
   date: Date,
   start: string,
   end: string,
-  description?: string
+  description?: string,
+  url?: string
 }
 
 export interface BasicOpeningHour{

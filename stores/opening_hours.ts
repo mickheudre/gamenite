@@ -13,7 +13,7 @@ export const useOpeningHoursStore = defineStore('openingHoursStore', () => {
         if( day !== 1 )
             now.setHours(-24 * (day - 1));
 
-        const {data, error} = await supabase.from("opening_hours").select("*,  org (id, name), organizer (id, username)").gte("start_at", now.toISOString())
+        const {data, error} = await supabase.from("opening_hours").select("*,  org (id, name), organizer (id, username)")
         const events = ref([])
         return data
     })

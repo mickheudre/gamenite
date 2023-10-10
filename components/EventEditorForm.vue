@@ -21,6 +21,9 @@
         <UFormGroup label="Description" name="description">
             <UTextarea v-model="state.description"/>
         </UFormGroup>
+        <UFormGroup label="Lien" name="link">
+            <UInput v-model="state.url"/>
+        </UFormGroup>
         <!-- <UFormGroup label="Tables" name="tables" >
             <USelectMenu :options="tableStore.tables" v-model="state.tables" multiple>
                 <template #option="{option}">
@@ -60,6 +63,7 @@ const state = ref({
     start: props.eventRequest?.event?.start ?? "10:00",
     end: props.eventRequest?.event?.end ?? "18:00",
     description: props.eventRequest?.event?.description ?? undefined,
+    url: props.eventRequest?.event?.url ?? undefined,
     tables: props.eventRequest?.tables ?? []
 })
 

@@ -44,7 +44,7 @@
                     </small>
                     
                     <div class="relative flex flex-col justify-end items-center my-4 z-30">
-                        <UButton v-if="event.class=='opening_hour' && userCanBookTable" @click="bookTable(event)" variant="ghost" color="black">Réserver une table</UButton>
+                        <UButton v-if="event.class=='opening_hour' && userCanBookTable && bookingOpen(event)" @click="bookTable(event)" variant="ghost" color="black">Réserver une table</UButton>
                     </div>
                     <div v-if="event.class=== 'event'" class="absolute top-0 left-0.5 sm:left-1.5 bottom-0 w-0.5 sm:w-1.5 bg-jungle-green-500 -z-10">
                     </div>
@@ -218,6 +218,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     }
     
     const handleEventRequest = async (eventRequest: EventEditionRequest) => {
+        console.log(eventRequest)
         awaitingForResponse.value = true
         if (eventRequest.mode === 'create') {
             
@@ -226,7 +227,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 const {startDate, endDate} = basicEventDateTimeToDate(eventRequest.event)
                 
                 if (eventRequest.type === 'event') {
-                    const {data, error } = await eventsStore.addEvent({name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
+                    const {data, error } = await eventsStore.addEvent({name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate, url: eventRequest.event.url})
                     if (data && newCalEventObject.event) {
                         newCalEventObject.event.title = data.name
                         newCalEventObject.event.class = "event"
@@ -266,7 +267,7 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
                 const {startDate, endDate} = basicEventDateTimeToDate(eventRequest.event)
                 
                 if (eventRequest.type === 'event') {
-                    const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate})
+                    const {data, error} = await eventsStore.updateEvent({id: eventRequest.id, name: eventRequest.event.name, description: eventRequest.event.description, start_at: startDate, end_at: endDate, url: eventRequest.event.url})
                     if (data) {
                         const found = eventsCal.value.find(ev => ev.id === data.id)
                         if (found) {
@@ -351,6 +352,11 @@ const eventRequest : Ref<EventEditionRequest | null> = ref(null)
     const userCanBookTable = computed(() => {
         return userStore.profile?.permissions['fightClub'].find(p => p == 'bookTable')
     })
+
+    const bookingOpen = (event) => {
+        const now = new Date()
+        return event.end > now
+    }
 </script>
 
 

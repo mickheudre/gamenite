@@ -6,14 +6,16 @@
                     <h4 class="font-bold text-xl mb-4">{{event?.name  }}</h4>
                 </div>
                 <div class="flex justify-between items-center">
-                <span class="capitalize">{{ formatDate(event.start_at) }}</span>
-                <div class="border rounded-md items-center flex space-x-2 p-1 px-2"><UIcon name="i-heroicons-clock"/><span > {{ `${formatTime(event.start_at, event.end_at)}`  }}</span></div>
-                
-            </div>
+                    <span class="capitalize">{{ formatDate(event.start_at) }}</span>
+                    <div class="border rounded-md items-center flex space-x-2 p-1 px-2"><UIcon name="i-heroicons-clock"/><span > {{ `${formatTime(event.start_at, event.end_at)}`  }}</span></div>
+                    
+                </div>
             </template>
-
-            <div class="list-disc" v-html="markdown" />
             
+            <div class="list-disc" v-html="markdown" />
+            <div class="my-4">
+                <a v-if="event.url" :href="event?.url" >Inscription</a>
+            </div>
         </UCard>
     </UModal>
 </template>
