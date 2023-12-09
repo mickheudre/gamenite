@@ -8,7 +8,7 @@ export const useEventsStore = defineStore('eventsStore', () => {
     const fightClubId = "fc791731-3a07-4125-9b3d-4969815290a5"
     
     const {pending, data: events, error, refresh} =  useLazyAsyncData('events', async () => {
-        const {data, error} = await supabase.from("events").select("*")
+        const {data, error} = await supabase.from("events").select("*, type (Nom)")
         const events = ref([])
         return data
     })

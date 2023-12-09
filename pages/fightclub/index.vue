@@ -34,7 +34,7 @@
 
                     <div class="relative vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 items-center justify-center z-30 " >
                         <UIcon v-if="event.class=='opening_hour'" class="text-xl" name="i-heroicons-building-storefront" />
-                        <UIcon v-if="event.class=='event'" class="text-xl" name="i-heroicons-trophy" />
+                        <UIcon v-if="event.class=='event' && event.type.Nom == 'Tournoi'" class="text-xl" name="i-heroicons-trophy" />
 
                         <span class="hidden sm:block">{{ event.title }}</span>
                     </div>
@@ -99,8 +99,8 @@ const toast = useToast()
 
 const bookingFormVisible = ref(false)
 const bookingInfo = ref()
-eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event"}))
-openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour", background: true}))
+eventsStore.events?.forEach(event =>  eventsCal.value.push({ title: event.name, start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, description: event.description, class: "event", type: event.type}))
+openingHours.value?.forEach(event => eventsCal.value.push({ title: "Ouvert", start: new Date(event.start_at), end: new Date(event.end_at), id: event.id, organizer: event.organizer, class: "opening_hour", background: true, type: null}))
 
 
 const awaitingForResponse = ref(false)
