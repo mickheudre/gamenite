@@ -32,7 +32,7 @@ export const useOrgStore = defineStore('orgStore', () => {
     }
 
     const createRoles = async (memberId : string, roles : Array<string>) => {
-        const {data, error} = await supabase.from("roles").insert({user: memberId, org: 1, roles : roles}).select("user (id, username), roles").single()
+        const {data, error} = await supabase.from("roles").insert({user: memberId, org: fightClubId, roles : roles}).select("user (id, username), roles").single()
 
         if (data) {
            members.value?.push(data)
