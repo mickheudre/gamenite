@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const { iconsPlugin, getIconCollections } = require("@egoist/tailwindcss-icons")
+
 module.exports = {
   content: [
     `./components/**/*.{vue,js,ts}`,
@@ -153,6 +155,13 @@ module.exports = {
     'Noto Color Emoji'
   ]
     }
-  }
+  },
+  plugins: [
+    iconsPlugin({
+      // Select the icon collections you want to use
+      // You can also ignore this option to automatically discover all icon collections you have installed
+      collections: getIconCollections(["heroicons", "lucide"]),
+    }),
+  ],
 }
 

@@ -35,7 +35,7 @@
                     <div class="relative vuecal__event-title md:mx-2 text-white text-sm  font-semibold my-2 items-center justify-center z-30 " >
                         <UIcon v-if="event.class=='opening_hour'" class="text-xl" name="i-heroicons-building-storefront" />
                         <UIcon v-if="event.class=='event' && event.type.Nom == 'Tournoi'" class="text-xl" name="i-heroicons-trophy" />
-
+                        <UIcon v-else class="text-xl" name="i-lucide-swords"/>
                         <span class="hidden sm:block">{{ event.title }}</span>
                     </div>
                     
